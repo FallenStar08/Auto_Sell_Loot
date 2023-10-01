@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="328" lslib_meta="v1,bswap_guids" />
+	<region id="Templates">
+		<node id="Templates">
+			<children>
+				<node id="GameObjects">
+					<attribute id="MapKey" type="FixedString" value="93165800-7962-4dec-96dc-1310129f6620" />
+					<attribute id="Name" type="LSString" value="AS_OBJ_SackOfCommerce"/> 
+					<attribute id="Type" type="FixedString" value="item" />
+					<attribute id="ParentTemplateId" type="FixedString" value="2e40240b-77d3-400b-bd6a-caff66a85833" />
+					<attribute id="Stats" type="FixedString" value="AS_OBJ_SackOfCommerce"/>
+					<attribute id="StoryItem" type="bool" value="True" />
+					<attribute id="Icon" type="FixedString" value="AS_ICON_SackOfCommerce" /> key that'll be used to bind icon to object(?)
+					<attribute id="DisplayName" type="TranslatedString" handle="hbbb9dc98g5791g4c49gab6dg0ee36d9db4c4" version="1" />
+					<attribute id="Description" type="TranslatedString" handle="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1" />
+					<attribute id="TechnicalDescription" type="TranslatedString" handle="h52f85295ga79bg4101gab57g07012ae166d2" version="1" />
+				</node>
+			</children>
+		</node>
+	</region>
+</save>
