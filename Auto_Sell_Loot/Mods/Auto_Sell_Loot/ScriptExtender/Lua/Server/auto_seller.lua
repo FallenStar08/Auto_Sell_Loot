@@ -131,7 +131,6 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         for name, uid in pairs(addedItems) do JUNKTABLESET[name] = uid end
         -- Save to file
         Config.selllist["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
-        --! should be fine since we're in sets Config.selllist["SELLLIST"] = Table.Remove_duplicates(Config.selllist["SELLLIST"])
         JSON.LuaTableToFile(Config.selllist, Config.selllist_json_file_path)
         REMOVER_BAG_CONTENT_LIST = {}
         -- ------------------- Delete temporary items from the bag ------------------ --
