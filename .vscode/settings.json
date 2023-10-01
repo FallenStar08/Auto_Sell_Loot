@@ -1,5 +1,24 @@
 {
     "Lua.diagnostics.globals": [
         "Ext"
+    ],
+    "cSpell.words": [
+        "AUTOSELL",
+        "formated",
+        "Gameplay",
+        "handi",
+        "JUNKTABLE",
+        "junktableset",
+        "JUNKTABLESET",
+        "keeplist",
+        "KEEPLIST",
+        "obvsiously",
+        "redump",
+        "selllist",
+        "SELLLIST",
+        "squadies",
+        "Squadies",
+        "SQUADIES",
+        "sucess"
     ]
 }
