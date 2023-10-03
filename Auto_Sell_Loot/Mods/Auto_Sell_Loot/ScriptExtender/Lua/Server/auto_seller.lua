@@ -309,7 +309,7 @@ end)
 -- Includes moving from container to other inventories etc...
 
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, inventoryHolder, addType)
-    if not Config.initDone then return end                                                                   --Somehow got there before Init (probably new game)
+    if not Config.initDone then return end                                    --Somehow got there before Init (probably new game)
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled or Editing list
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
@@ -318,11 +318,12 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     Bags.FindBagItemFromTemplate()
     --Set weights of items inside bag to 0
     if SEll_LIST_EDIT_MODE == true then
-        if inventoryHolder==SELL_ADD_BAG_ITEM then
-        local itemUUID = string.sub(item, -36)
-        Ext.Entity.Get(itemUUID):GetComponent("Data").Weight=0
-        Ext.Entity.Get(itemUUID):Replicate("Data")
-        return
+        if inventoryHolder == SELL_ADD_BAG_ITEM then
+            local itemUUID = string.sub(item, -36)
+            Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
+            Ext.Entity.Get(itemUUID):Replicate("Data")
+            return
+        end
     end
     -- Ideally only check this if item not in junktableset
     -- Not really possible with current code structure (ie the mess)
