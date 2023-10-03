@@ -46,7 +46,7 @@ end
 
 -- Durgy will come to me, yeah, yeah
 --Needed puzzle pieces :
--- ? Flow : --> Throw bag on the ground -> Hit bag in the face -> trigger durgy search -> make durgy come to us -> trade opens -> stop auto selling 
+-- ? Flow : --> Throw bag on the ground -> Hit bag in the face -> trigger durgy search -> make durgy come to us -> trade opens -> stop auto selling
 -- ? -> trade window ends -> remove bought items from the list -> durgy goes back to the nude zone with his bros
 -- * Find Durgy -> DONE
 -- TODO Send "sold" items to durgy inventory, so just don't poof them, yeah, no poof
@@ -60,7 +60,7 @@ end
 -- function Osi.RequestTrade(character, trader, tradeMode, itemsTagFilter) end
 
 -- Event to know when durgy screen closes
--- Event : Osi.TradeEnds(character, trader) 
+-- Event : Osi.TradeEnds(character, trader)
 
 -- Event to know which items were bought
 -- Event : Osi.MovedFromTo(movedObject, fromObject, toObject, isTrade) end
@@ -245,10 +245,12 @@ function HandleSelling(Character, Root, Item)
         local goldToAdd = SELL_VALUE_COUNTER
         AddGoldTo(Character, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
-        RemoveItemFrom(Character, Root, exactItemAmount)
+        DeleteItem(Character, Item, exactItemAmount)
+        --RemoveItemFrom(Character, Root, exactItemAmount)
         SELL_VALUE_COUNTER = SELL_VALUE_COUNTER - goldToAdd
     else
-        RemoveItemFrom(Character, Root, exactItemAmount)
+        DeleteItem(Character, Item, exactItemAmount)
+        --RemoveItemFrom(Character, Root, exactItemAmount)
     end
 end
 
@@ -256,20 +258,12 @@ function AddGoldTo(Character, Amount)
     Osi.TemplateAddTo(GOLD, Character, Amount)
 end
 
-function RemoveItemFrom(Character, Root, Amount)
-    if Amount > 1 then
-        Osi.TemplateRemoveFrom(Root, Character, Amount)
-    else
-        --? Yes this is fucking weird but it solves a weird issue
-        --? 6 torches in a container, pickup all of them to your inventory
-        --? Function will be called 6 times for 1 item to remove
-        --? Yet only one item will be removed
-        --? Seems to be a server tick issue or something
-        Amount = 1000
-        Osi.TemplateRemoveFrom(Root, Character, Amount)
-    end
-    BasicDebug(string.format("RemoveItemFrom() - function called on Character %s for %d amount of item with root %s",
-        Character, Amount, Root))
+function DeleteItem(Character, Item, Amount)
+    Osi.TeleportTo(Item, Character, "", 0, 0, 0, 1, 1)
+    Item = string.sub(Item, -36)
+    Osi.SetOnStage(Item, 0)
+    BasicDebug(string.format("DeleteItem() - function called on Character %s for %d amount of item with UUID %s",
+        Character, Amount, Item))
 end
 
 -- -------------------------------------------------------------------------- --
@@ -314,14 +308,14 @@ end)
 -- Includes moving from container to other inventories etc...
 
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, inventoryHolder, addType)
-    if not Config.initDone then return end --Somehow got there before Init (probably new game)
+    if not Config.initDone then return end                                                                   --Somehow got there before Init (probably new game)
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 or SEll_LIST_EDIT_MODE == true then return end -- Mod Disabled or Editing list
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
     if root == GOLD then return end --Ignore gold
     local itemName = RemoveTrailingNumbers(GetItemName(item))
     Bags.FindBagItemFromTemplate()
-    
+
     -- Ideally only check this if item not in junktableset
     -- Not really possible with current code structure (ie the mess)
     if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
@@ -338,6 +332,10 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) ..
             " - Item prefix : " .. itemName .. " - ROOT : " .. root)
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
+            local itemUUID = string.sub(item, -36)
+            if Osi.IsContainer(itemUUID) == 1 then
+                Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
+            end
             HandleSelling(inventoryHolder, root, item)
             return
         else
