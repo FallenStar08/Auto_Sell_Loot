@@ -326,14 +326,18 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             BasicDebug("Setting weight of item :"..item.." to 0")
             local itemUUID = string.sub(item, -36)
             Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
+            Ext.Entity.Get(itemUUID):GetComponent("Value").Value = 0
             Ext.Entity.Get(itemUUID):Replicate("Data")
+            Ext.Entity.Get(itemUUID):Replicate("Value")
             return
         end
         return
     end
     -- Ideally only check this if item not in junktableset
     -- Not really possible with current code structure (ie the mess)
-    if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 0 then
+        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+    end
     -- Ignore the event firing for inventories other than the ones of our party
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then

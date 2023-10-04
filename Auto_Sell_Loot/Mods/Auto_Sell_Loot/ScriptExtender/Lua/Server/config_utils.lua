@@ -31,7 +31,7 @@ Config.default_config_tbl = {
     FIX_MODE = 0,
     GIVE_BAG = 1,
     CUSTOM_LISTS_ONLY = 0,
-
+    BAG_SELL_MODE_ONLY = 0,
 }
 
 Config.default_junk = {
