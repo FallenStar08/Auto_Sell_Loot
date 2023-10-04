@@ -317,13 +317,19 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     local itemName = RemoveTrailingNumbers(GetItemName(item))
     Bags.FindBagItemFromTemplate()
     --Set weights of items inside bag to 0
+    BasicDebug(SEll_LIST_EDIT_MODE)
+    BasicDebug(inventoryHolder)
     if SEll_LIST_EDIT_MODE == true then
-        if inventoryHolder == SELL_ADD_BAG_ITEM then
+        BasicDebug("SELL LIST EDIT MODE TEMPLATE ADDED to the following inventory holder: " .. inventoryHolder)
+        BasicDebug("Bag UUID for reference : " .. SELL_ADD_BAG_ITEM)
+        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
+            BasicDebug("Setting weight of item :"..item.." to 0")
             local itemUUID = string.sub(item, -36)
             Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
             Ext.Entity.Get(itemUUID):Replicate("Data")
             return
         end
+        return
     end
     -- Ideally only check this if item not in junktableset
     -- Not really possible with current code structure (ie the mess)
