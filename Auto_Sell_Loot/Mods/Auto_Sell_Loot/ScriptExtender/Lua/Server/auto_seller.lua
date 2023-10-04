@@ -194,6 +194,7 @@ function Bags.AddBag(bag, character, notification)
 end
 
 function Bags.AddToSellList(item_name, root)
+    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then return end
     JUNKTABLESET[item_name] = root
     -- Save the added item to file for next load
     Config.selllist["SELLLIST"][item_name] = root
@@ -224,7 +225,7 @@ end
 -- Removing the "sold" items from the inventory
 -- Cache gold value, easy optimization that probably is totally useless
 local itemValueCache = {}
-function HandleSelling(Character, Root, Item)
+function HandleSelling(Owner,Character, Root, Item)
     -- exact is actually exact, total seems to see in the future and combine the next amounts or some shit I don't get it
     -- difference seems to be related to server ticks and when they get the amount
     local exactItemAmount, totalAmount = Osi.GetStackAmount(Item)
@@ -244,7 +245,7 @@ function HandleSelling(Character, Root, Item)
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
         local goldToAdd = SELL_VALUE_COUNTER
-        AddGoldTo(Character, goldToAdd)
+        AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
         DeleteItem(Character, Item, exactItemAmount)
         --RemoveItemFrom(Character, Root, exactItemAmount)
@@ -309,35 +310,39 @@ end)
 -- Includes moving from container to other inventories etc...
 
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, inventoryHolder, addType)
-    if not Config.initDone then return end                                    --Somehow got there before Init (probably new game)
-    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled or Editing list
+    if not Config.initDone then return end                                    --Somehow got there before Init (probably new game stuff)
+    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
     if root == GOLD then return end --Ignore gold
     local itemName = RemoveTrailingNumbers(GetItemName(item))
     Bags.FindBagItemFromTemplate()
-    --Set weights of items inside bag to 0
-    BasicDebug(SEll_LIST_EDIT_MODE)
-    BasicDebug(inventoryHolder)
+    --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
-        BasicDebug("SELL LIST EDIT MODE TEMPLATE ADDED to the following inventory holder: " .. inventoryHolder)
-        BasicDebug("Bag UUID for reference : " .. SELL_ADD_BAG_ITEM)
         if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
-            BasicDebug("Setting weight of item :"..item.." to 0")
             local itemUUID = string.sub(item, -36)
             Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
             Ext.Entity.Get(itemUUID):GetComponent("Value").Value = 0
             Ext.Entity.Get(itemUUID):Replicate("Data")
             Ext.Entity.Get(itemUUID):Replicate("Value")
+            --TODO Do something to trigger a refresh of the weight here
+            --TODO probably add/remove an item to the bag
             return
         end
         return
     end
     -- Ideally only check this if item not in junktableset
     -- Not really possible with current code structure (ie the mess)
-    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 0 then
-        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+    if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+
+    --Specific to BAG SELL MODE ONLY
+    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then
+        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
+            local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
+            HandleSelling(char,inventoryHolder, root, item)
+        end
     end
+
     -- Ignore the event firing for inventories other than the ones of our party
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
@@ -355,7 +360,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             if Osi.IsContainer(itemUUID) == 1 then
                 Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
             end
-            HandleSelling(inventoryHolder, root, item)
+            HandleSelling(inventoryHolder,inventoryHolder, root, item)
             return
         else
             -- Ignored item
