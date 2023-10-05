@@ -3,16 +3,16 @@ local MessagesSinceLastSizeCheck = 25 -- Always check the first insertion
 local SizeCheckInterval = 25 -- Check the log file size every x insertions
 local averageLineLength = 100 -- Assuming an average line length, kind of arbitrary
 
-local function custom_floor(x)
+function Custom_floor(x)
     return x - x % 1
 end
 
 local function GetTimestamp()
     local time = Ext.Utils.MonotonicTime()
     local milliseconds = time % 1000
-    local seconds = custom_floor(time / 1000) % 60
-    local minutes = custom_floor((time / 1000) / 60) % 60
-    local hours = custom_floor(((time / 1000) / 60) / 60) % 24
+    local seconds = Custom_floor(time / 1000) % 60
+    local minutes = Custom_floor((time / 1000) / 60) % 60
+    local hours = Custom_floor(((time / 1000) / 60) / 60) % 24
     return string.format("[%02d:%02d:%02d.%03d]",
         hours, minutes, seconds, milliseconds)
 end

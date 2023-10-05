@@ -16,8 +16,10 @@ GOLD = "1c3c9c74-34a1-4685-989e-410dc080be6f"
 SELL_ADD_BAG_ITEM = ""
 SQUADIES = {}
 SELL_VALUE_COUNTER = 0
+FRACTIONAL_PART = 0
 MOD_ENABLED = true
 SEll_LIST_EDIT_MODE = false
+DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
 
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
@@ -40,69 +42,18 @@ function RemoveTrailingNumbers(inputString)
     return inputString:gsub("_%d%d%d$", "")
 end
 
--- -------------------------------------------------------------------------- --
---                                PROJECT DURGY                               --
--- -------------------------------------------------------------------------- --
-
--- Durgy will come to me, yeah, yeah
---Needed puzzle pieces :
--- ? Flow : --> Throw bag on the ground -> Hit bag in the face -> trigger durgy search -> make durgy come to us -> trade opens -> stop auto selling
--- ? -> trade window ends -> remove bought items from the list -> durgy goes back to the nude zone with his bros
--- * Find Durgy -> DONE
--- TODO Send "sold" items to durgy inventory, so just don't poof them, yeah, no poof
--- TODO Automatically pickup baggy from the ground once he gets slapped hard enough because people will forget him
--- TODO write the code for real :)
-
--- Event needed to know when baggy gets slapped :
--- Event : function Osi.AttackedBy(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID) end
-
--- Event to test :
--- function Osi.RequestTrade(character, trader, tradeMode, itemsTagFilter) end
-
--- Event to know when durgy screen closes
--- Event : Osi.TradeEnds(character, trader)
-
--- Event to know which items were bought
--- Event : Osi.MovedFromTo(movedObject, fromObject, toObject, isTrade) end
-
--- Event to test :
--- Event : function Osi.DialogStarted(dialog, instanceID) end
-
--- To move items to durgy :
--- function Osi.MoveItemTo(character, item, target, amount, event) end
-
--- To pickup baggy :
--- function Osi.Pickup(character, item, event, forcePickUpOnFailure)
-
--- Find durgy logic :
--- Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function (guid, id)
---     if id == "durgy" then
--- 		local root=Osi.GetTemplate(guid)
---         if root == "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b" then
--- 		    local durgy=guid
--- 			Osi.TeleportTo(durgy,Osi.GetHostCharacter())
--- 			Osi.SetCanTrade(durgy,1)
--- 			Osi.ActivateTrade(Osi.GetHostCharacter(),durgy,1)
--- 		end
---     elseif id == "durgy_done" then
---         BasicDebug("durgy_done")
--- 		if durgy then BasicPrint(durgy) end
---     end
--- end)
-
---Osi.IterateCharacters("durgy", "durgy_done")
-
-
-
-
-
-
-
-
-
-
-
-
+function DelayedExecutionWithTicks(ticks, action)
+    local tickCount = 0
+    local function TickCallback()
+        tickCount = tickCount + 1
+        if tickCount >= ticks then
+            action()
+        else
+            Ext.OnNextTick(TickCallback)
+        end
+    end
+    Ext.OnNextTick(TickCallback)
+end
 
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
@@ -225,7 +176,7 @@ end
 -- Removing the "sold" items from the inventory
 -- Cache gold value, easy optimization that probably is totally useless
 local itemValueCache = {}
-function HandleSelling(Owner,Character, Root, Item)
+function HandleSelling(Owner, Character, Root, Item)
     -- exact is actually exact, total seems to see in the future and combine the next amounts or some shit I don't get it
     -- difference seems to be related to server ticks and when they get the amount
     local exactItemAmount, totalAmount = Osi.GetStackAmount(Item)
@@ -244,15 +195,17 @@ function HandleSelling(Owner,Character, Root, Item)
     -- Accumulate the sell values
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
-        local goldToAdd = SELL_VALUE_COUNTER
+        local goldToAdd = Custom_floor(SELL_VALUE_COUNTER) --Integer part
+        FRACTIONAL_PART = FRACTIONAL_PART + (SELL_VALUE_COUNTER - goldToAdd)
+        goldToAdd=goldToAdd+Custom_floor(FRACTIONAL_PART)  -- Fractional part
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
+        BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
         DeleteItem(Character, Item, exactItemAmount)
-        --RemoveItemFrom(Character, Root, exactItemAmount)
-        SELL_VALUE_COUNTER = SELL_VALUE_COUNTER - goldToAdd
+        SELL_VALUE_COUNTER = 0
+        FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART)  -- Keep the remaining fractional part for later
     else
         DeleteItem(Character, Item, exactItemAmount)
-        --RemoveItemFrom(Character, Root, exactItemAmount)
     end
 end
 
@@ -260,10 +213,12 @@ function AddGoldTo(Character, Amount)
     Osi.TemplateAddTo(GOLD, Character, Amount)
 end
 
+function RemoveGoldFrom(Character, Amount)
+    Osi.TemplateRemoveFrom(GOLD, Character, Amount)
+end
+
 function DeleteItem(Character, Item, Amount)
-    Osi.TeleportTo(Item, Character, "", 0, 0, 0, 1, 1)
-    Item = string.sub(Item, -36)
-    Osi.SetOnStage(Item, 0)
+    Osi.RequestDelete(Item)
     BasicDebug(string.format("DeleteItem() - function called on Character %s for %d amount of item with UUID %s",
         Character, Amount, Item))
 end
@@ -274,7 +229,6 @@ end
 
 -- Loading is done Update SQUADIES and create the JUNKTABLESET from the base junk list and our sell & keep list
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, isEditorMode)
-    BasicPrintForced("EVENT LevelGameplayStarted level : " .. level)
     if level == "SYS_CC_I" then return end
     if not Config.initDone then Config.Init() end
 
@@ -306,9 +260,7 @@ Ext.Osiris.RegisterListener("CharacterLeftParty", 1, "after", function(Character
 end)
 
 
--- Register an event listener for when an item is Added To {something}
 -- Includes moving from container to other inventories etc...
-
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, inventoryHolder, addType)
     if not Config.initDone then return end                                    --Somehow got there before Init (probably new game stuff)
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
@@ -331,15 +283,15 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
         end
         return
     end
-    -- Ideally only check this if item not in junktableset
-    -- Not really possible with current code structure (ie the mess)
+
+    --Draggidy dropped onto the baggy, addy to the sell listy
     if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
 
     --Specific to BAG SELL MODE ONLY
     if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then
         if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
             local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
-            HandleSelling(char,inventoryHolder, root, item)
+            HandleSelling(char, inventoryHolder, root, item)
         end
     end
 
@@ -360,7 +312,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             if Osi.IsContainer(itemUUID) == 1 then
                 Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
             end
-            HandleSelling(inventoryHolder,inventoryHolder, root, item)
+            HandleSelling(inventoryHolder, inventoryHolder, root, item)
             return
         else
             -- Ignored item

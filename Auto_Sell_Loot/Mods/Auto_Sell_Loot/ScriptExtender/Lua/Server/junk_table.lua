@@ -288,7 +288,6 @@ local junkTable = {
   ["DEC_Laboratory_Flask_Glass_Installation_E_Empty_A"] = "6aa75479-f26f-48ab-bc05-9c117532dccb",
   ["DEC_Laboratory_Flask_Glass_Installation_E_GlowA"] = "0b48f520-8027-4329-8ef0-c18cc210bc84",
   ["DEC_Laboratory_Flask_Glass_Installation_E"] = "b4b7fdd0-8419-4d9e-b6ce-c97da832e3c4",
-  ["DEC_Necromancer_Dead_Pixie_Bowl_A"] = "bc3d21bb-233b-4b8a-82e9-ba22ea3c4d27",
   ["DEC_Underdark_Gnomes_Basket_E"] = "4de078ef-0727-4357-828d-6c81293e1429",
   ["DEC_Underdark_Gnomes_Basket_F"] = "a3209932-42d4-4a3d-88f2-422602038c42",
   ["DEC_Underdark_Gnomes_Basket_G"] = "1edd1e81-eeaa-48af-a723-f735bd6f1e0b",
