@@ -200,10 +200,10 @@ function HandleSelling(Owner, Character, Root, Item)
         goldToAdd=goldToAdd+Custom_floor(FRACTIONAL_PART)  -- Fractional part
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
-        BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
         DeleteItem(Character, Item, exactItemAmount)
         SELL_VALUE_COUNTER = 0
-        FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART)  -- Keep the remaining fractional part for later
+        FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
+        BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")  
     else
         DeleteItem(Character, Item, exactItemAmount)
     end
