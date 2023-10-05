@@ -12,11 +12,10 @@ Config.selllist_json_file_path = "sell_list.json"
 Config.logPath = "logs.txt"
 
 FolderName = "Fall_AutoSeller"
-Config.CurrentVersion = "3"
-
+MODVERSION=Ext.Mod.GetMod("0662253d-1cbf-479f-80c2-5878c6eb5a80").Info.ModVersion
+Config.CurrentVersion = MODVERSION[2].."."..MODVERSION[1]..".".."0".."."..MODVERSION[4]
 -- TODO basically log level selector, rename it later
 DEBUG_MESSAGES = 3
-
 -- TODO REMINDER use string.format for everything
 -- -------------------------------------------------------------------------- --
 --                               Default tables                               --
@@ -204,7 +203,7 @@ end
 function Config.Init()
     -- Until we read the user's log level just pretend it's the default one
     DEBUG_MESSAGES = Config.default_config_tbl["DEBUG_MESSAGES"]
-    BasicPrint("Config.Init() - Automatic loot seller by FallenStar MAJOR VERSION : "..Config.CurrentVersion.." starting up... ")
+    BasicPrint("Config.Init() - Automatic loot seller by FallenStar VERSION : "..Config.CurrentVersion.." starting up... ")
     local loadedConfig = Files.Load(Config.config_json_file_path)
     -- Check if the config file doesn't exist, Initialize it
     if not loadedConfig then Config.InitDefaultConfig(Config.config_json_file_path, Config.default_config_tbl) end
