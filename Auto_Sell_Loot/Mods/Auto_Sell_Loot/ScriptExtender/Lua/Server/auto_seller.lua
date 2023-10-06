@@ -59,8 +59,6 @@ function DelayedExecutionWithTicks(ticks, action)
     Ext.OnNextTick(TickCallback)
 end
 
-
-
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
@@ -201,9 +199,9 @@ function HandleSelling(Owner, Character, Root, Item)
     -- Accumulate the sell values
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
-        local goldToAdd = Custom_floor(SELL_VALUE_COUNTER) --Integer part
+        local goldToAdd = Custom_floor(SELL_VALUE_COUNTER)    --Integer part
         FRACTIONAL_PART = FRACTIONAL_PART + (SELL_VALUE_COUNTER - goldToAdd)
-        goldToAdd=goldToAdd+Custom_floor(FRACTIONAL_PART)  -- Fractional part
+        goldToAdd = goldToAdd + Custom_floor(FRACTIONAL_PART) -- Fractional part
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
         DeleteItem(Character, Item, exactItemAmount)
@@ -303,16 +301,14 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     -- Ignore the event firing for inventories other than the ones of our party
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
-        local translatedName=Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "NO HANDLE"
+        local translatedName = Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "NO HANDLE"
         BasicDebug({
             "ITEM NAME : " .. translatedName,
             "ROOT : " .. root,
             "ITEM : " .. item,
             "Item prefix : " .. itemName,
             "Root prefix : " .. rootName })
-        Files.LogMessage("ITEM NAME : " ..
-            Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) ..
-            " - Item prefix : " .. itemName .. " - ROOT : " .. root)
+        Files.LogMessage("ITEM NAME : " .. translatedName .. " - Item prefix : " .. itemName .. " - ROOT : " .. root)
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
             local itemUUID = string.sub(item, -36)
             if Osi.IsContainer(itemUUID) == 1 then
