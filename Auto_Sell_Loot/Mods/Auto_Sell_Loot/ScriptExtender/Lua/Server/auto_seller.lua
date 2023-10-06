@@ -272,7 +272,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
     if root == GOLD then return end --Ignore gold
-    local itemName = RemoveTrailingNumbers(GetItemName(item))
+    local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
     Bags.FindBagItemFromTemplate()
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
@@ -303,7 +303,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     -- Ignore the event firing for inventories other than the ones of our party
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
-        local translatedName=Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "INVALID NAME"
+        local translatedName=Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "NO HANDLE"
         BasicDebug({
             "ITEM NAME : " .. translatedName,
             "ROOT : " .. root,
