@@ -301,8 +301,9 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     -- Ignore the event firing for inventories other than the ones of our party
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
+        local translatedName=Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "INVALID NAME"
         BasicDebug({
-            "ITEM NAME : " .. Osi.ResolveTranslatedString(Osi.GetDisplayName(item)),
+            "ITEM NAME : " .. translatedName,
             "ROOT : " .. root,
             "ITEM : " .. item,
             "Item prefix : " .. itemName,
