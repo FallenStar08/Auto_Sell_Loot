@@ -7,6 +7,10 @@ Ext.Require("Server/table_utils.lua")
 -- -------------------------------------------------------------------------- --
 --                                   GLOBALS                                  --
 -- -------------------------------------------------------------------------- --
+
+--Todo fix bad mods not giving their items names, resulting in every bad items being matched
+--Todo for fuck sake, set key to be = to value in case of empty string name
+
 Bags = {
 
 }
@@ -203,7 +207,7 @@ function HandleSelling(Owner, Character, Root, Item)
         DeleteItem(Character, Item, exactItemAmount)
         SELL_VALUE_COUNTER = 0
         FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
-        BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")  
+        BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
     else
         DeleteItem(Character, Item, exactItemAmount)
     end
@@ -239,7 +243,6 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, 
         SELL_VALUE_PERCENTAGE = Config.GetValue(Config.config_tbl, "SELL_VALUE_PERCENTAGE")
         BasicDebug("SELL_VALUE_PERCENTAGE : " .. SELL_VALUE_PERCENTAGE)
         -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
-        -- Ideally do this earlier if that's even possible
         BasicDebug(Config.keeplist)
         BasicDebug(Config.selllist)
         local keepList = Config.GetValue(Config.keeplist, "KEEPLIST")

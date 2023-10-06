@@ -41,7 +41,7 @@ function Files.CheckLogFileSize()
     if fileSize > MaxLogFileSize then
         if Files.ArchiveAndClearLog(logPath) then
             BasicPrint("CheckLogFileSize() - Log file reached maximum allowed size, archiving")
-        else 
+        else
             BasicWarning("CheckLogFileSize() - Couldn't archive log file, turning LOGGING OFF until reload")
             Config.SetValue(Config.config_tbl,"ENABLE_LOGGING",0)
         end
