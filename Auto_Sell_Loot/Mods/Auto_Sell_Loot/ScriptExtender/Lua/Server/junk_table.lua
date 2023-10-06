@@ -731,5 +731,6 @@ local junkTable = {
   ["UNI_WYR_ExplosiveToy_Unfinished"] = "3762d9ce-3506-4d2c-8b36-454d9fef979f",
   ["UNI_WYR_Thiefling_HolyHandSoap"] = "42d56907-aa68-4f77-a024-3789c323214d",
   ["WPN_Grenade_BloodSurface"] = "7821978d-c720-4651-9693-936960145636",
+  ["CINE_DEC_FARM_Bucket_A"] = "5825eed5-043a-4425-b5ba-7616bec6c3e6",
 }
 return junkTable
