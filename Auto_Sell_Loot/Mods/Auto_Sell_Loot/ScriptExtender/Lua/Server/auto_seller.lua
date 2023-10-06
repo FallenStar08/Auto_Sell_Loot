@@ -271,6 +271,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
     root = string.sub(root, -36)
     if root == GOLD then return end --Ignore gold
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
+
     Bags.FindBagItemFromTemplate()
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then

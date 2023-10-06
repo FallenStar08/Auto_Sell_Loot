@@ -298,6 +298,7 @@ local junkTable = {
   ["FUR_GEN_Kitchen_Cup_Glass_B"] = "17e92565-b2aa-4e53-b3ff-a4691a0fa69f",
   ["FUR_GEN_Painting_A_PlainCanvas"] = "e028bac5-f393-4d6a-9873-670241d721ac",
   ["FUR_GEN_Painting_A"] = "3826d249-55fb-4e3d-9c6f-b2383bc2c330",
+  ["FUR_GEN_Painting_Portrait_C"] = "82ad7f96-b84c-4ab0-98bb-b534c69726ba",
   ["FUR_GEN_Painting_Gortash_A"] = "0094760a-2728-410a-94cd-3ed4180a8a46",
   ["FUR_GEN_Painting_Jannath_A"] = "4b7db979-3081-407d-ac55-c1af87862e7e",
   ["FUR_GEN_Painting_Jannath_Canvas_A"] = "9b0be641-79a5-4db8-b9f7-ab1b9376cd07",
