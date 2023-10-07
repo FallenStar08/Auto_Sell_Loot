@@ -324,7 +324,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             "Root prefix : " .. rootName,
             string.format("['%s'] = '%s',", itemName, root)
         })
-        Files.LogMessage("ITEM NAME : " .. translatedName .. " - Item prefix : " .. itemName .. " - ROOT : " .. root)
+        Files.LogMessage(string.format("%s lua table entry : ['%s'] = '%s',",translatedName, itemName, root))
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
             local itemUUID = string.sub(item, -36)
             if Osi.IsContainer(itemUUID) == 1 then
