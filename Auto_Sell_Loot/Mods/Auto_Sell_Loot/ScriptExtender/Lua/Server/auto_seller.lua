@@ -21,7 +21,6 @@ SELL_ADD_BAG_ITEM = ""
 SQUADIES = {}
 SELL_VALUE_COUNTER = 0
 FRACTIONAL_PART = 0
-MOD_ENABLED = true
 SEll_LIST_EDIT_MODE = false
 DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
 
@@ -77,6 +76,24 @@ function DeleteItem(Character, Item, Amount)
     BasicDebug("DeleteItem() - function called on Character : " ..
     Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
 end
+
+
+-- -------------------------------------------------------------------------- --
+--                             Transmorbing fixes                             --
+-- -------------------------------------------------------------------------- --
+Ext.Osiris.RegisterListener("RequestCanCombine", 7, "after", function(character, item1, item2, item3, item4, item5, requestID)
+	Config.config_tbl.MOD_ENABLED = false
+
+end)
+
+Ext.Osiris.RegisterListener("StoppedCombining ", 6, "after", function(character, item1, item2, item3, item4, item5)
+	Config.config_tbl.MOD_ENABLED  = true
+
+end)
+
+
+
+
 
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
