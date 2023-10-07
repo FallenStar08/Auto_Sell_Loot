@@ -64,6 +64,20 @@ function DelayedExecutionWithTicks(ticks, action)
     Ext.OnNextTick(TickCallback)
 end
 
+function AddGoldTo(Character, Amount)
+    Osi.TemplateAddTo(GOLD, Character, Amount)
+end
+
+function RemoveGoldFrom(Character, Amount)
+    Osi.TemplateRemoveFrom(GOLD, Character, Amount)
+end
+
+function DeleteItem(Character, Item, Amount)
+    Osi.RequestDelete(Item)
+    BasicDebug("DeleteItem() - function called on Character : " ..
+    Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
+end
+
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
@@ -226,19 +240,7 @@ function HandleSelling(Owner, Character, Root, Item)
     end
 end
 
-function AddGoldTo(Character, Amount)
-    Osi.TemplateAddTo(GOLD, Character, Amount)
-end
 
-function RemoveGoldFrom(Character, Amount)
-    Osi.TemplateRemoveFrom(GOLD, Character, Amount)
-end
-
-function DeleteItem(Character, Item, Amount)
-    Osi.RequestDelete(Item)
-    BasicDebug("DeleteItem() - function called on Character : " ..
-    Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
-end
 
 -- -------------------------------------------------------------------------- --
 --                            Core Logic Listeners                            --
