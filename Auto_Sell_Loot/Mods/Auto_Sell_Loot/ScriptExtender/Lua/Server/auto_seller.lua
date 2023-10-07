@@ -321,8 +321,9 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             "ROOT : " .. root,
             "ITEM : " .. item,
             "Item prefix : " .. itemName,
-            "Root prefix : " .. rootName })
-        BasicDebug(string.format("[%s] = %s", itemName, root))
+            "Root prefix : " .. rootName,
+            string.format('["%s"] = "%s",', itemName, root)
+        })
         Files.LogMessage("ITEM NAME : " .. translatedName .. " - Item prefix : " .. itemName .. " - ROOT : " .. root)
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
             local itemUUID = string.sub(item, -36)
