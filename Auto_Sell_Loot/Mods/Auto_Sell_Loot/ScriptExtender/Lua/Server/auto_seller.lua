@@ -74,26 +74,20 @@ end
 function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
     BasicDebug("DeleteItem() - function called on Character : " ..
-    Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
+        Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
 end
 
-
--- -------------------------------------------------------------------------- --
---                             Transmorbing fixes                             --
--- -------------------------------------------------------------------------- --
-Ext.Osiris.RegisterListener("RequestCanCombine", 7, "after", function(character, item1, item2, item3, item4, item5, requestID)
-	Config.config_tbl.MOD_ENABLED = false
-
-end)
-
-Ext.Osiris.RegisterListener("StoppedCombining ", 6, "after", function(character, item1, item2, item3, item4, item5)
-	Config.config_tbl.MOD_ENABLED  = true
-
-end)
-
-
-
-
+--Yolo
+function IsTransmogInvisible(ItemName, Item)
+    if ItemName == "LOOT_GEN_Ring_A_Gem_A_Gold" then
+        if Osi.GetStatString(Item) == "ARM_Ring_A_Gem_A_Gold" then
+            return false
+        else
+            return true
+        end
+    end
+    return false
+end
 
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
@@ -294,7 +288,7 @@ end)
 
 
 -- Includes moving from container to other inventories etc...
-Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, inventoryHolder, addType)
+Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
     if not Config.initDone then return end                                    --Somehow got there before Init (probably new game stuff)
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
     local rootName = GetItemName(root)
@@ -341,7 +335,11 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(root, item, 
             "Root prefix : " .. rootName,
             string.format("['%s'] = '%s',", itemName, root)
         })
-        Files.LogMessage(string.format("%s lua table entry : ['%s'] = '%s',",translatedName, itemName, root))
+        if IsTransmogInvisible(itemName, item) then
+            BasicDebug("Ignoring transmorb item")
+            return
+        end
+        Files.LogMessage(string.format("%s lua table entry : ['%s'] = '%s',", translatedName, itemName, root))
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
             local itemUUID = string.sub(item, -36)
             if Osi.IsContainer(itemUUID) == 1 then
