@@ -77,12 +77,15 @@ function DeleteItem(Character, Item, Amount)
         Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
 end
 
---Yolo
+--Anti morbing measure, this ain't morbing time
 function IsTransmogInvisible(ItemName, Item)
     if ItemName == "LOOT_GEN_Ring_A_Gem_A_Gold" then
-        if Osi.GetStatString(Item) == "ARM_Ring_A_Gem_A_Gold" then
+        BasicDebug("IsTransmogInvisible() - " .. ItemName .. " UUID : " .. Item)
+        BasicDebug("StatString : " .. Ext.Entity.Get(Item).Data.StatsId)
+        if Ext.Entity.Get(Item).Data.StatsId == "ARM_Ring_A_Gem_A_Gold" then
             return false
         else
+            BasicWarning("IsTransmogInvisible() - Ignoring invisible transmorbed item, this is not a ring!")
             return true
         end
     end
