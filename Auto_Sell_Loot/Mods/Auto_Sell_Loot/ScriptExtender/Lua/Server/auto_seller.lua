@@ -236,8 +236,8 @@ end
 
 function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
-    BasicDebug(string.format("DeleteItem() - function called on Character %s for %d amount of item with UUID %s",
-        Character, Amount, Item))
+    BasicDebug("DeleteItem() - function called on Character : " ..
+    Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
 end
 
 -- -------------------------------------------------------------------------- --
