@@ -46,6 +46,11 @@ function RemoveTrailingNumbers(inputString)
     return inputString:gsub("_%d%d%d$", "")
 end
 
+--Fuck you whoever made me add this garbage
+function StringEmpty(str)
+    return not string.match(str, "%S")
+end
+
 function DelayedExecutionWithTicks(ticks, action)
     local tickCount = 0
     local function TickCallback()
@@ -67,7 +72,10 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
     -- -------------------------- Bags.AddContentToList ------------------------- --
     if id == "AS_bagItems_OnItem" then
         BasicDebug("EVENT - EntityEvent Inventory Iteration for event : " .. id)
-        REMOVER_BAG_CONTENT_LIST[GetItemName(guid)] = string.sub(Osi.GetTemplate(guid), -36)
+        local itemName = GetItemName(guid)
+        if not StringEmpty(itemName) then
+            REMOVER_BAG_CONTENT_LIST[itemName] = string.sub(Osi.GetTemplate(guid), -36)
+        end
     elseif id == "AS_bagItems_Done" then
         -- Do this in a function, or don't
         BasicDebug("EVENT - EntityEvent with id : " .. id .. " finished")
@@ -75,7 +83,7 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         local removedItems = Table.CompareSets(Config.selllist["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
         -- Because people will obvsiously complain they can't add items to the list by having the bag open
         -- Anticipating next complain being the fact that it doesn't pay them this way
-        -- Fuck that, not doing it :')
+        -- Fuck that, not doing it... yet? :')
         local addedItems = Table.CompareSets(REMOVER_BAG_CONTENT_LIST, Config.selllist["SELLLIST"])
         BasicDebug("EVENT - EntityEvent Removed Items after bag closing :")
         BasicDebug(removedItems)
@@ -93,8 +101,9 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
     end
     if id == "AS_bagItems_OnItemDelete" then
         -- ------------------- Delete temporary items from the bag ------------------ --
-        local exactItemAmount, totalAmount = Osi.GetStackAmount(guid)
-        Osi.TemplateRemoveFrom(string.sub(Osi.GetTemplate(guid), -36), SELL_ADD_BAG_ITEM, exactItemAmount)
+        DeleteItem("", guid, "some")
+        --local exactItemAmount, totalAmount = Osi.GetStackAmount(guid)
+        --Osi.TemplateRemoveFrom(string.sub(Osi.GetTemplate(guid), -36), SELL_ADD_BAG_ITEM, exactItemAmount)
     end
 end)
 
@@ -150,6 +159,10 @@ end
 
 function Bags.AddToSellList(item_name, root)
     if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then return end
+    if StringEmpty(item_name) then
+        BasicDebug("AddToSellList() - BAD ITEM with root : " .. root)
+        return
+    end
     JUNKTABLESET[item_name] = root
     -- Save the added item to file for next load
     Config.selllist["SELLLIST"][item_name] = root
