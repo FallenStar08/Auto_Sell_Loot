@@ -754,5 +754,6 @@ local junkTable = {
   ["WYR_FfionRing"] = "18c6beaf-e553-462d-aa59-74b5ff1adb1c",
   ["DEC_GEN_Junk_A_FishSkeleton_A"] = "53664ef4-bfda-4775-a8da-780ae07343e4",
   ["DEC_GEN_BoilingCauldron_Gruel_A_Boiling_A"] = "5589d5c8-28b2-446b-9cb7-259ebe77d901",
+  ['ARM_Gloves_Hide'] = 'ff2db301-84a9-4449-a85e-babe48f10c02',
 }
 return junkTable
