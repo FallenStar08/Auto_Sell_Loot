@@ -756,5 +756,6 @@ local junkTable = {
   ["DEC_GEN_BoilingCauldron_Gruel_A_Boiling_A"] = "5589d5c8-28b2-446b-9cb7-259ebe77d901",
   ['ARM_Gloves_Hide'] = 'ff2db301-84a9-4449-a85e-babe48f10c02',
   ["S_HAV_MolsDeal_Lanceboard"] = "be905812-03f2-4803-b4d1-65300d4d8d14",
+  ['LOOT_GEN_MusicBox_A'] = 'fe651984-16d0-428a-bf15-7bee24a31f71',
 }
 return junkTable
