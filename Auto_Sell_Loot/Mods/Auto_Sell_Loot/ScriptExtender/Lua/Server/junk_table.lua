@@ -759,5 +759,6 @@ local junkTable = {
   ['LOOT_GEN_MusicBox_A'] = 'fe651984-16d0-428a-bf15-7bee24a31f71',
   ['DEC_GEN_Towels_Stacked_C'] = '66719d7c-7731-a7ac-bad3-a80f4416ca4f',
   ['DEC_GEN_Towels_Stacked_E'] = '97d13e04-5298-0dd5-d1fe-2f263a670112',
+  ['CONS_GEN_Drink_Mug_Metal_A_Beer'] = '9ab9c085-4d24-4b78-85ac-e16b19107ba7',
 }
 return junkTable
