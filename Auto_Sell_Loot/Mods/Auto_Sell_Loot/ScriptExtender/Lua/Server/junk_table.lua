@@ -549,7 +549,6 @@ local junkTable = {
   ["LOOT_GEN_Metalbar_Adamantine_A"] = "ed758113-c69b-4e7f-8b41-036a071df80a",
   ["LOOT_GEN_Metalbar_Bronze_A"] = "5b386575-5836-40cd-8548-e5c27fd105a1",
   ["LOOT_GEN_Metalbar_Gold_A"] = "44f47718-9769-4c0e-af75-7789d2f2913d",
-  ["LOOT_GEN_Metalbar_Silver_A"] = "e0803337-e2b1-4528-8d4f-b5814e9a52ec",
   ["LOOT_GEN_Needle_A"] = "5f02a904-d5f0-4e5e-86fd-0cc690e7681c",
   ["LOOT_GEN_Pipe_A"] = "b9432719-b2ce-47a0-b349-4b12744dc4ff",
   ["LOOT_GEN_Pipe_B"] = "d9adc825-966a-4eeb-9b1c-950ec941c269",
