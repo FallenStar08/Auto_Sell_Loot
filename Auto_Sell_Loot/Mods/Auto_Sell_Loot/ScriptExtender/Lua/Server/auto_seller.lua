@@ -330,7 +330,12 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     -- Important for party view (& Multiplayer?), otherwise we would just check against the host character
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
         --Error check this
-        local translatedName = Osi.ResolveTranslatedString(Osi.GetDisplayName(item)) or "NO HANDLE"
+        local success, translatedName = pcall(function()
+            return Osi.ResolveTranslatedString(Osi.GetDisplayName(item))
+        end)
+        if not success then
+            translatedName = "NO HANDLE"
+        end
         BasicDebug({
             "ITEM NAME : " .. translatedName,
             "ROOT : " .. root,
