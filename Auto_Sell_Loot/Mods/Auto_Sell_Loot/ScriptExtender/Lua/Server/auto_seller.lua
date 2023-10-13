@@ -323,6 +323,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
             local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
             HandleSelling(char, inventoryHolder, root, item)
+            return
         end
     end
 
