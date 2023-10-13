@@ -760,5 +760,13 @@ local junkTable = {
   ['DEC_GEN_Towels_Stacked_E'] = '97d13e04-5298-0dd5-d1fe-2f263a670112',
   ['CONS_GEN_Drink_Mug_Metal_A_Beer'] = '9ab9c085-4d24-4b78-85ac-e16b19107ba7',
   ['S_MOO_Necromancer_GobletWithTadpoles'] = 'd522f555-02f5-4dfa-911e-e190d4deb4cf',
+  ['CONS_Potion_Barkskin_A'] = 'ea964c3d-7606-48b3-95aa-6efef87ed28c',
+  ['CONS_Potion_Misty_Step_A'] = 'eb0a6ee0-ce09-46af-a9d4-305c3109fc87',
+  ['S_PaintingThatConcealsAButton'] = '7f7f86c0-41ca-4938-b4da-2719a3f69102',
+  ['DEC_Hospital_Bloodbank_Transfusion_Bottle_B'] = 'beb3f8a3-bb27-4054-99a2-500126fc7e5d',
+  ['CINE_LOOT_GEN_Palette_Paint_A'] = 'c705abfd-7bdc-464c-a260-d451666d1a63',
+  ['BGO_Cabbage_Spoiled'] = 'c8c45a00-9ad5-4f93-809c-3fd36a28d7ec',
+  ['WPN_WATCHER_Greatsword_B'] = 'ebdf1022-bb30-4a03-ac29-82f488bfce4f',
+  ['WPN_WATCHER_Crossbow'] = 'e2391c41-845c-4d8e-9aba-d2392e193bfd',
 }
 return junkTable
