@@ -1,3 +1,5 @@
+local logBuffer = "" -- Initialize an empty log buffer
+local logBufferMaxSize = 512 -- Maximum buffer size before flushing
 
 local function custom_floor(x)
     return x - x % 1
@@ -14,14 +16,22 @@ local function GetTimestamp()
 end
 
 function Files.LogMessage(message)
-        local logMessage = GetTimestamp() .. " " .. message
-        Files.AppendToLog(logMessage)
+    local logMessage = GetTimestamp() .. " " .. message
+    logBuffer = logBuffer .. logMessage .. "\n"
+    
+    -- Check if the buffer size exceeds the maximum, then flush it
+    if #logBuffer >= logBufferMaxSize then
+        Files.FlushLogBuffer()
+    end
 end
 
-function Files.AppendToLog(content)
-    local logPath = Config.logPath
-    local fileContent = Files.Load(logPath) or ""
-    Files.Save(logPath, fileContent .. content .. "\n")
+function Files.FlushLogBuffer()
+    if logBuffer ~= "" then
+        local logPath = Config.logPath
+        local fileContent = Files.Load(logPath) or ""
+        Files.Save(logPath, fileContent .. logBuffer)
+        logBuffer = "" -- Clear the buffer
+    end
 end
 
 function Files.ClearLogFile()

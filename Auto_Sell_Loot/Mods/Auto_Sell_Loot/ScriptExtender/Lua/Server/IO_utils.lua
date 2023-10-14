@@ -50,9 +50,18 @@ function BasicPrintForced(content)
 end
 
 function BasicPrint(content, messageType)
+    --Defaults to INFO
     local messageType = messageType or "INFO"
+    --Yolo plug the log function inside our print function.
+    local logging = false
     if Config.config_tbl.ENABLE_LOGGING == 1 then
+        logging = true
+    end
+    if logging then
         Files.LogMessage(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
+        if messageType == "ERROR" or messageType == "WARNING" then
+            Files.FlushLogBuffer()
+        end
     end
     if DEBUG_MESSAGES <= 0 then
         return
