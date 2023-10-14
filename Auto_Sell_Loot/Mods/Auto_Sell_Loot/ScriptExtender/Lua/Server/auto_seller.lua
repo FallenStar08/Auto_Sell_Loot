@@ -349,7 +349,6 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
             BasicDebug("Ignoring transmorb item")
             return
         end
-        Files.LogMessage(string.format("%s lua table entry : ['%s'] = '%s',", translatedName, itemName, root))
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
             local itemUUID = string.sub(item, -36)
             if Osi.IsContainer(itemUUID) == 1 then
