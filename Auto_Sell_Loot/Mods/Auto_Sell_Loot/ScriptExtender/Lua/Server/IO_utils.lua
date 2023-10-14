@@ -50,32 +50,28 @@ function BasicPrintForced(content)
 end
 
 function BasicPrint(content, messageType)
-    --Defaults to INFO
-    local messageType = messageType or "INFO"
-    --Yolo plug the log function inside our print function.
-    local logging = false
+    messageType = messageType or "INFO"
+    local prefix = "Fallen_AutoSell  [" .. messageType .. "]"
+    local formattedMessage = ConcatOutput(ConcatPrefix(prefix, content))
+
     if Config.config_tbl.ENABLE_LOGGING == 1 then
-        logging = true
-    end
-    if logging then
-        Files.LogMessage(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
+        Files.LogMessage(formattedMessage)
         if messageType == "ERROR" or messageType == "WARNING" then
             Files.FlushLogBuffer()
         end
     end
-    if DEBUG_MESSAGES <= 0 then
-        return
-    end
-    if PrintTypes[messageType] and DEBUG_MESSAGES >= PrintTypes[messageType] then
+
+    if DEBUG_MESSAGES > 0 and PrintTypes[messageType] and DEBUG_MESSAGES >= PrintTypes[messageType] then
         if messageType == "ERROR" then
-            printError(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
+            printError(formattedMessage)
         elseif messageType == "WARNING" then
-            printWarning(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
+            printWarning(formattedMessage)
         else
-            print(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
+            print(formattedMessage)
         end
     end
 end
+
 
 function BasicError(content)
     BasicPrint(content, "ERROR")
