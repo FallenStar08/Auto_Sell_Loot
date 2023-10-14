@@ -1,6 +1,7 @@
 {
     "Lua.diagnostics.globals": [
-        "Ext"
+        "Ext",
+        "Osiris"
     ],
     "cSpell.words": [
         "Alfira",

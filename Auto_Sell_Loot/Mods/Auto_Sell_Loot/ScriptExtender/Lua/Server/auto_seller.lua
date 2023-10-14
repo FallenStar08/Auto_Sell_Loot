@@ -85,7 +85,8 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
     if id == "AS_bagItems_OnItem" then
         local itemName = GetItemName(guid)
         if not StringEmpty(itemName) then
-            REMOVER_BAG_CONTENT_LIST[itemName] = string.sub(Osi.GetTemplate(guid), -36)
+            local template = Osi.GetTemplate(guid)
+            REMOVER_BAG_CONTENT_LIST[itemName] = string.sub(template, -36)
         end
     elseif id == "AS_bagItems_Done" then
         -- Do this in a function, or don't
@@ -208,6 +209,7 @@ function HandleSelling(Owner, Character, Root, Item)
     -- exact is actually exact, total seems to see in the future and combine the next amounts or some shit I don't get it
     -- difference seems to be related to server ticks and when they get the amount
     local exactItemAmount, totalAmount = Osi.GetStackAmount(Item)
+    exactItemAmount, totalAmount = exactItemAmount or 1, totalAmount or 1
     -- Check cache itemValue is the value of 1 item, even in a stack
     local itemValue = itemValueCache[Item]
     if not itemValue then
@@ -318,6 +320,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
         --Error check this
         local success, translatedName = pcall(function()
+---@diagnostic disable-next-line: param-type-mismatch
             return Osi.ResolveTranslatedString(Osi.GetDisplayName(item))
         end)
         if not success then
