@@ -215,8 +215,11 @@ function HandleSelling(Owner, Character, Root, Item)
     if not itemValue then
         -- Cache miss, get the value
         itemValue = Osi.ItemGetGoldValue(Item)
-        BasicDebug("HandleSelling() - Item Value before further manipulation : " ..
-            itemValue .. " exactItemAmount : " .. exactItemAmount .. " totalAmount : " .. totalAmount)
+        BasicDebug({ 
+            "HandleSelling() - before manipulation",
+            "Item Value  : " .. itemValue,
+            "exactItemAmount : " .. exactItemAmount,
+            "totalAmount : " .. totalAmount })
         itemValue = itemValue / totalAmount
         itemValueCache[Item] = itemValue
     end
@@ -320,7 +323,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     if Table.CheckIfValueExists(SQUADIES, inventoryHolder) or inventoryHolder == Osi.GetHostCharacter() then
         --Error check this
         local success, translatedName = pcall(function()
----@diagnostic disable-next-line: param-type-mismatch
+            ---@diagnostic disable-next-line: param-type-mismatch
             return Osi.ResolveTranslatedString(Osi.GetDisplayName(item))
         end)
         if not success then
