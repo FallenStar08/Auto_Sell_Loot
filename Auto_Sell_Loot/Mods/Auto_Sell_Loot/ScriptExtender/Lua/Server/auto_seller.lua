@@ -275,6 +275,9 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, 
         local sellList = Config.GetValue(Config.selllist, "SELLLIST")
         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, keepList, sellList)
         Bags.FindBagItemFromTemplate()
+        if Config.config_tbl.ENABLE_LOGGING == 1 then
+            Files.FlushLogBuffer()
+        end
     end
 end)
 
