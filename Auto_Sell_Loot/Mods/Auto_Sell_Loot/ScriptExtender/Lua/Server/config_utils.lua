@@ -201,6 +201,7 @@ function Config.LoadUserLists()
 end
 
 function Config.Init()
+    Files.ClearLogFile()
     -- Until we read the user's log level just pretend it's the default one
     DEBUG_MESSAGES = Config.default_config_tbl["DEBUG_MESSAGES"]
     BasicPrint("Config.Init() - Automatic loot seller by FallenStar VERSION : "..Config.CurrentVersion.." starting up... ")

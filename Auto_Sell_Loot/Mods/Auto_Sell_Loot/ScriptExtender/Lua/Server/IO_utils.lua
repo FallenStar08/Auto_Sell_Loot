@@ -51,7 +51,7 @@ end
 
 function BasicPrint(content, messageType)
     local messageType = messageType or "INFO"
-    if Config.config_tbl.LOG_ENABLED == 1 then
+    if Config.config_tbl.ENABLE_LOGGING == 1 then
         Files.LogMessage(ConcatOutput(ConcatPrefix("Fallen_AutoSell  [" .. messageType .. "]", content)))
     end
     if DEBUG_MESSAGES <= 0 then
