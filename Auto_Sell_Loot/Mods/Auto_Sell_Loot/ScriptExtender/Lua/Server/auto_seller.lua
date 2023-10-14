@@ -99,7 +99,6 @@ end
 Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
     -- -------------------------- Bags.AddContentToList ------------------------- --
     if id == "AS_bagItems_OnItem" then
-        BasicDebug("EVENT - EntityEvent Inventory Iteration for event : " .. id)
         local itemName = GetItemName(guid)
         if not StringEmpty(itemName) then
             REMOVER_BAG_CONTENT_LIST[itemName] = string.sub(Osi.GetTemplate(guid), -36)
