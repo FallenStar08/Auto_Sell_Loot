@@ -8,9 +8,6 @@ Ext.Require("Server/table_utils.lua")
 --                                   GLOBALS                                  --
 -- -------------------------------------------------------------------------- --
 
---Todo fix bad mods not giving their items names, resulting in every bad items being matched
---Todo for fuck sake, set key to be = to value in case of empty string name
-
 Bags = {
 
 }
@@ -48,19 +45,6 @@ end
 --Fuck you whoever made me add this garbage
 function StringEmpty(str)
     return not string.match(str, "%S")
-end
-
-function DelayedExecutionWithTicks(ticks, action)
-    local tickCount = 0
-    local function TickCallback()
-        tickCount = tickCount + 1
-        if tickCount >= ticks then
-            action()
-        else
-            Ext.OnNextTick(TickCallback)
-        end
-    end
-    Ext.OnNextTick(TickCallback)
 end
 
 function AddGoldTo(Character, Amount)
