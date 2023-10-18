@@ -717,7 +717,6 @@ local junkTable = {
   ["QUEST_LOOT_Human_Bodypart_Hand_A_Stone"] = "ab546f8b-7a7b-432a-b045-b7697c04105c",
   ["QUEST_WYR_RedKnightChessPiece"] = "40899561-06fa-4cbf-8031-c839fea44331",
   ["QUEST_WYR_RinglessGemstone"] = "219a9d40-41b3-4225-a187-64bbc8e96525",
-  ["S_CRE_FakeBloodOfLathander"] = "523d0cea-7f79-4f5c-ad4b-3c09633609e6",
   ["S_HAV_MolsDeal_Lanceboard"] = "be905812-03f2-4803-b4d1-65300d4d8d14",
   ["S_PLA_DoubtingArtist_Painting1"] = "8a407bd7-effe-4306-b2a0-02624ad45074",
   ["S_PLA_DoubtingArtist_Painting2"] = "ffb6d084-0900-4f58-ae39-f0360f7488d1",
