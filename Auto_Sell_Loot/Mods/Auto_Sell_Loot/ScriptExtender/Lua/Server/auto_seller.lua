@@ -3,6 +3,7 @@ Ext.Require("Server/IO_utils.lua")
 Ext.Require("Server/config_utils.lua")
 Ext.Require("Server/log_utils.lua")
 Ext.Require("Server/table_utils.lua")
+--TODO BLACKLIST BAG ITSELF FROM BAG
 
 -- -------------------------------------------------------------------------- --
 --                                   GLOBALS                                  --
@@ -287,7 +288,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
-    if root == GOLD then return end --Ignore gold
+    if root == GOLD or root == SELL_ADD_BAG_ROOT then return end --Ignore gold & bag
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
 
     Bags.FindBagItemFromTemplate()
