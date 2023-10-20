@@ -72,7 +72,9 @@ function Config.LoadConfig(filePath)
 
     return config
 end
-
+---@param config table Configuration table
+---@param key string Key we're trying to get the value from
+---@return ... The Key value
 function Config.GetValue(config, key)
     if config[key] ~= nil then
         return config[key]
