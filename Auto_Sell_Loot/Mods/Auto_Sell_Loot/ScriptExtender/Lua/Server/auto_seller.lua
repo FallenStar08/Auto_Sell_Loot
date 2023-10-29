@@ -21,15 +21,6 @@ FRACTIONAL_PART = 0
 SEll_LIST_EDIT_MODE = false
 DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
 
-Messages = {
-    message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
-    message_bag_sell_mode = Osi.ResolveTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
-    message_user_list_only = Osi.ResolveTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
-    message_save_specific_list = Osi.ResolveTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
-    message_save_specific_list_already_exist = Osi.ResolveTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
-    message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca")
-}
-
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
@@ -83,6 +74,18 @@ function IsTransmogInvisible(ItemName, Item)
         end
     end
     return false
+end
+
+function ResolveMessagesHandles()
+    local Messages = {
+        message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
+        message_bag_sell_mode = Osi.ResolveTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
+        message_user_list_only = Osi.ResolveTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
+        message_save_specific_list = Osi.ResolveTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
+        message_save_specific_list_already_exist = Osi.ResolveTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
+        message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca")
+    }
+    return Messages
 end
 
 -- -------------------------------------------------------------------------- --
@@ -261,6 +264,7 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, 
     if not Config.initDone then Config.Init() end
 
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 1 then
+        Messages=ResolveMessagesHandles()
         SQUADIES = GetSquadies()
         -- Add the bag(s) to the host char if none found in party inventory
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
