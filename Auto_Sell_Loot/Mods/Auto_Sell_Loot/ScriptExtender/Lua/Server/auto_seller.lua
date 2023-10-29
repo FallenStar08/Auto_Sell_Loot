@@ -22,18 +22,12 @@ SEll_LIST_EDIT_MODE = false
 DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
 
 Messages = {
-    message_warning_config_start =
-    "You are about to start the configuration of the auto sell mod, do not press escape and READ the option, press yes to start the configuration or no to abort",
-    message_bag_sell_mode =
-    "Do you want to set the bag to sell mode only? \n if this is enabled the item you drag & drop into the bag won't be added to your sell list.",
-    message_user_list_only =
-    "Do you want to only use your personal sell list? \n if this is enabled the mod won't use its internal junk list.",
-    message_save_specific_list =
-    "Do you want to use a save specific sell list for this save? \n if this is enabled your personal list will be tied to this save file. \n WARNING THIS WILL CREATE A NEW EMPTY LIST SPECIFIC TO THIS SAVE FILE! IF THIS IS ALREADY ENABLED CLICK YES",
-    message_save_specific_list_already_exist =
-    "You are currently using a save specific personal sell list, do you want to go back to using the global personal sell list?",
-    message_clear_sell_list =
-    "Do you want to clear your personal sell list?"
+    message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
+    message_bag_sell_mode = Osi.ResolveTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
+    message_user_list_only = Osi.ResolveTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
+    message_save_specific_list = Osi.ResolveTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
+    message_save_specific_list_already_exist = Osi.ResolveTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
+    message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca")
 }
 
 -- -------------------------------------------------------------------------- --
@@ -424,10 +418,6 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         --Id already exists so we're just turning it on back
         elseif result == 1 and PersistentVars.saveIdentifier then
             PersistentVars.useSaveSpecificSellList=true
-        --shouldn't be possible to get there
-        elseif result == 0 and PersistentVars.saveIdentifier then
-            PersistentVars.useSaveSpecificSellList=false
-            Config.LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
     --Config save specific list already exist

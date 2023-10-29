@@ -4,6 +4,13 @@
 	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Drag and drop items to the bag to add them to the list of automatically sold items.
 - Open the bag to edit your list
 - Removing an item from the bag in edit mode will remove it from the list and save it
-- The list is saved once you close the bag</content>
+- The list is saved once you close the bag
+- Hit the bag on the ground to start configuring the mod</content>
 	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">By magic's embrace, the item fades without a trace, in its stead, a golden grace. For adventurers in haste, a boon, a path to wealth they chase!</content>
+	<content contentuid="h995d430eg9629g40c8g9470g6f515582195b" version="1">You are about to start the configuration of the auto sell mod, do not press escape and READ the options, press yes to start the configuration or no to abort.</content>
+	<content contentuid="h70fb978cg63cbg44d2ga45eg89bcacb356c8" version="1">Do you want to set the bag to sell mode only? &lt;br&gt; if this is enabled the item you drag & drop into the bag won't be added to your sell list.</content>
+	<content contentuid="hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae" version="1">Do you want to only use your personal sell list? &lt;br&gt; if this is enabled the mod won't use its internal junk list and only the item you manually add to the bag will automatically be sold.</content>
+	<content contentuid="h5172487eg9d0eg4c06g93e3g5badf1e9401c" version="1">Do you want to use a save specific sell list for this save? &lt;br&gt; if this is enabled your personal list will be tied to this save file. &lt;br&gt; WARNING THIS WILL CREATE A NEW EMPTY LIST SPECIFIC TO THIS SAVE FILE! IF THIS IS ALREADY ENABLED CLICK YES.</content>
+	<content contentuid="hbc85062bg1b97g4150g9d31gacac9018d58b" version="1">You are currently using a save specific personal sell list, do you want to go back to using the global personal sell list? Your save specific will be kept and will be used if enabled back later on.</content>
+	<content contentuid="hd5b72a24g4401g4986gae60g9db54155f4ca" version="1">Do you want to clear your personal sell list?</content>
 </contentList>
