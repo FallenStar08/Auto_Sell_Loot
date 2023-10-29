@@ -13,7 +13,7 @@ Config.logPath = "logs.txt"
 
 FolderName = "Fall_AutoSeller"
 MODVERSION=Ext.Mod.GetMod("0662253d-1cbf-479f-80c2-5878c6eb5a80").Info.ModVersion
-Config.CurrentVersion = MODVERSION[2].."."..MODVERSION[1]..".".."0".."."..MODVERSION[4]
+Config.CurrentVersion = MODVERSION[1].."."..MODVERSION[2].."."..MODVERSION[3].."."..MODVERSION[4]
 -- TODO basically log level selector, rename it later
 DEBUG_MESSAGES = 3
 -- TODO REMINDER use string.format for everything
