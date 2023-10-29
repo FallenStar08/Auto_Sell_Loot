@@ -777,7 +777,6 @@ local junkTable = {
   ["TOOL_Masonry_Hammer_A"] = "dd5c7204-df29-4bab-b012-9831f84b7fc7",
   ["TOOL_Rope_A"] = "63400c5f-cc10-4009-8d8f-b01dbb47060a",
   ["UNI_ARM_DEN_Thieflings_Ring1"] = "1abd032b-c138-45ee-b85e-62b5bbb6ea2d",
-  ["UNI_Cazador_FeignDeathPotion"] = "9f8a0a1c-b1f0-4f09-93eb-de364f1063f1",
   ["UNI_CRE_MisCutSunCrystal"] = "55f57f88-bed2-43bd-9f2d-4fd839b7b531",
   ["UNI_CRE_RawSunCrystal"] = "a6bc05c1-5cca-4b54-b83f-0ed546b5e326",
   ["UNI_DEN_KanonsHandkerchief"] = "276f2902-308d-4efe-9144-226c73f3edaa",
