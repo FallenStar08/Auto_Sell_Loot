@@ -422,6 +422,7 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         --Id already exists so we're just turning it on back
         elseif result == 1 and PersistentVars.saveIdentifier then
             PersistentVars.useSaveSpecificSellList=true
+            Config.LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
     --Config save specific list already exist
