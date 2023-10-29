@@ -3,7 +3,6 @@ Ext.Require("Server/IO_utils.lua")
 Ext.Require("Server/config_utils.lua")
 Ext.Require("Server/log_utils.lua")
 Ext.Require("Server/table_utils.lua")
---TODO BLACKLIST BAG ITSELF FROM BAG
 
 -- -------------------------------------------------------------------------- --
 --                                   GLOBALS                                  --
@@ -12,7 +11,7 @@ Ext.Require("Server/table_utils.lua")
 Bags = {
 
 }
-
+PersistentVars = {}
 SELL_ADD_BAG_ROOT = "93165800-7962-4dec-96dc-1310129f6620"
 GOLD = "1c3c9c74-34a1-4685-989e-410dc080be6f"
 SELL_ADD_BAG_ITEM = ""
@@ -21,6 +20,19 @@ SELL_VALUE_COUNTER = 0
 FRACTIONAL_PART = 0
 SEll_LIST_EDIT_MODE = false
 DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
+
+Messages = {
+    message_warning_config_start =
+    "You are about to start the configuration of the auto sell mod, do not press escape and READ the option, press yes to start the configuration or no to abort",
+    message_bag_sell_mode =
+    "Do you want to set the bag to sell mode only? \n if this is enabled the item you drag & drop into the bag won't be added to your sell list.",
+    message_user_list_only =
+    "Do you want to only use your personal sell list? \n if this is enabled the mod won't use its internal junk list.",
+    message_save_specific_list =
+    "Do you want to use a save specific sell list for this save? \n if this is enabled your personal list will be tied to this save file. \n WARNING THIS WILL CREATE A NEW EMPTY LIST SPECIFIC TO THIS SAVE FILE! IF THIS IS ALREADY ENABLED CLICK YES",
+    message_clear_sell_list =
+    "Do you want to clear your personal sell list?"
+}
 
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
@@ -107,7 +119,7 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         for name, uid in pairs(addedItems) do JUNKTABLESET[name] = uid end
         -- Save to file
         Config.selllist["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
-        JSON.LuaTableToFile(Config.selllist, Config.selllist_json_file_path)
+        JSON.LuaTableToFile(Config.selllist, Config.GetSellPath())
         REMOVER_BAG_CONTENT_LIST = {}
         -- ------------------- Delete temporary items from the bag ------------------ --
         Osi.IterateInventory(SELL_ADD_BAG_ITEM, "AS_bagItems_OnItemDelete", "AS_bagItems_DeleteDone")
@@ -179,7 +191,7 @@ function Bags.AddToSellList(item_name, root)
     JUNKTABLESET[item_name] = root
     -- Save the added item to file for next load
     Config.selllist["SELLLIST"][item_name] = root
-    JSON.LuaTableToFile(Config.selllist, Config.selllist_json_file_path)
+    JSON.LuaTableToFile(Config.selllist, Config.GetSellPath())
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
 end
@@ -216,7 +228,7 @@ function HandleSelling(Owner, Character, Root, Item)
     if not itemValue then
         -- Cache miss, get the value
         itemValue = Osi.ItemGetGoldValue(Item)
-        BasicDebug({ 
+        BasicDebug({
             "HandleSelling() - before manipulation",
             "Item Value  : " .. itemValue,
             "exactItemAmount : " .. exactItemAmount,
@@ -352,6 +364,66 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         else
             -- Ignored item
             return
+        end
+    end
+end)
+
+
+-- -------------------------------------------------------------------------- --
+--                                   Config                                   --
+-- -------------------------------------------------------------------------- --
+-- Events
+-- Osi.MessageBoxChoiceClosed (character, message, resultChoice)	
+-- Osi.MessageBoxClosed (character, message)	
+-- Osi.MessageBoxYesNoClosed (character, message, result)
+
+-- Functions
+-- OpenMessageBox (character, message)	
+-- OpenMessageBoxChoice (character, message, choice1, choice2)	
+-- OpenMessageBoxYesNo (character, message)
+
+
+Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
+    function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
+        if attackerOwner == Osi.GetHostCharacter() and defender == SELL_ADD_BAG_ITEM then
+            Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
+        end
+    end)
+
+Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
+    if message == Messages.message_warning_config_start then
+        if result == 1 then
+            Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
+        end
+    elseif message == Messages.message_bag_sell_mode then
+        if result == 1 then
+            Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", 1)
+        else
+            Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", 0)
+        end
+    Config.SaveConfig()
+    Osi.OpenMessageBoxYesNo(character, Messages.message_user_list_only)
+    elseif message == Messages.message_user_list_only then
+        if result == 1 then
+            Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", 1)
+        else
+            Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", 0)
+        end
+    Config.SaveConfig()
+    Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list)
+    elseif message == Messages.message_save_specific_list then
+        if result == 1 and not PersistentVars.saveIdentifier then
+            table.insert(PersistentVars, { saveIdentifier = Ext.Math.Random(0, 999999999) })
+            Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
+        elseif result == 0 and PersistentVars.saveIdentifier then
+            PersistentVars.saveIdentifier = nil
+        end
+    Osi.OpenMessageBoxYesNo(character,Messages.message_clear_sell_list)
+    elseif message == Messages.message_clear_sell_list then
+        if result == 1 then
+            Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
+        else
+            --do nothing
         end
     end
 end)

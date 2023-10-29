@@ -36,5 +36,7 @@ end
 
 function Files.ClearLogFile()
     local logPath = Config.logPath
-    Files.Save(logPath, "")
+    if Files.Load(logPath) then
+        Files.Save(logPath, "")
+    end
 end

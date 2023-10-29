@@ -48,16 +48,22 @@ Config.default_keep = {
 --                             Config IO functions                            --
 -- -------------------------------------------------------------------------- --
 
+--- Save a config table to a json file
+---@param filePath string the path of the json file
+---@param config table  the configuration table to save
 function Config.SaveConfig(filePath, config)
+    filePath=filePath or Config.config_json_file_path
+    config=config or Config.config_tbl
     local success, error_message = pcall(function()
         BasicPrint("Config.SaveConfig() - Config file saved")
         BasicDebug(config)
         JSON.LuaTableToFile(config, filePath)
     end)
-
     if not success then BasicWarning("Config.SaveConfig() - " .. error_message) end
 end
-
+--- Load a json configuration file and return a table
+---@param filePath string the path of the json file
+---@return table config the configuration table
 function Config.LoadConfig(filePath)
     local config = {}
 
@@ -72,6 +78,7 @@ function Config.LoadConfig(filePath)
 
     return config
 end
+--- Read a value in a configuration table
 ---@param config table Configuration table
 ---@param key string Key we're trying to get the value from
 ---@return ... The Key value
@@ -84,39 +91,43 @@ function Config.GetValue(config, key)
         return nil
     end
 end
-
+---Sets a value in a configuration table
+---@param config table Configuration table
+---@param key string Key we're changing the value
+---@param value any Value we're setting the key to
 function Config.SetValue(config, key, value)
     config[key] = value
 end
 
--- TODO Better name, make a separate function to validate the lists
+---Ensure all of our lists exist and create them if not, also validate their structure
 function EnsureAllListsExist()
     BasicPrint("EnsureAllListsExist() - Doing the ensuring")
-    local sellExists = Files.Load(Config.selllist_json_file_path)
-    local keepExists = Files.Load(Config.keeplist_json_file_path)
-    local junkExists = Files.Load(Config.junk_table_json_file_path)
-
+    local sellExists,keepExists,junkExists = false,false,false
+    local sellPath,keepPath,junkPath=Config.GetSellPath(),Config.keeplist_json_file_path,Config.junk_table_json_file_path
+    sellExists = Files.Load(sellPath)
+    keepExists = Files.Load(keepPath)
+    junkExists = Files.Load(junkPath)
     -- Create selllist if it doesn't exist
     if not sellExists then
-        Config.InitDefaultFilterList(Config.selllist_json_file_path, Config.default_sell)
+        Config.InitDefaultFilterList(sellPath, Config.default_sell)
     else
         -- Validate selllist structure
-        local selllist = Config.LoadConfig(Config.selllist_json_file_path)
+        local selllist = Config.LoadConfig(sellPath)
         if not selllist or not selllist.SELLLIST or type(selllist.SELLLIST) ~= "table" or not Table.IsValidSet(selllist.SELLLIST) then
             BasicWarning("EnsureAllListsExist() - Invalid selllist structure detected. Reinitializing...")
-            Config.InitDefaultFilterList(Config.selllist_json_file_path, Config.default_sell)
+            Config.InitDefaultFilterList(sellPath, Config.default_sell)
         end
     end
 
     -- Create keeplist if it doesn't exist
     if not keepExists then
-        Config.InitDefaultFilterList(Config.keeplist_json_file_path, Config.default_keep)
+        Config.InitDefaultFilterList(keepPath, Config.default_keep)
     else
         -- Validate keeplist structure
-        local keeplist = Config.LoadConfig(Config.keeplist_json_file_path)
+        local keeplist = Config.LoadConfig(keepPath)
         if not keeplist or not keeplist.KEEPLIST or type(keeplist.KEEPLIST) ~= "table" or not Table.IsValidSet(keeplist.KEEPLIST) then
             BasicWarning("EnsureAllListsExist() - Invalid keeplist structure detected. Reinitializing...")
-            Config.InitDefaultFilterList(Config.keeplist_json_file_path, Config.default_keep)
+            Config.InitDefaultFilterList(keepPath, Config.default_keep)
         end
     end
 
@@ -125,11 +136,14 @@ function EnsureAllListsExist()
         -- Avoid console spam
         local previousDBGValue = DEBUG_MESSAGES
         DEBUG_MESSAGES = 0
-        Config.InitDefaultFilterList(Config.junk_table_json_file_path, Config.default_junk)
+        Config.InitDefaultFilterList(junkPath, Config.default_junk)
         DEBUG_MESSAGES = previousDBGValue
     end
 end
 
+--- Check the structure of a config tbl by comparing it to the structure of our default_config_tbl
+---@param config table the config table to check
+---@return table config the repaired config table
 function CheckConfigStructure(config)
     local configChanged = false
     local defaultConfig = Config.default_config_tbl
@@ -175,29 +189,45 @@ end
 -- -------------------------------------------------------------------------- --
 --                          Initialization functions                          --
 -- -------------------------------------------------------------------------- --
+---Get the path to our selll list in case it's a save specific one
+---@return string sellPath the path to our sell list
+function Config.GetSellPath()
+    local sellPath=Config.selllist_json_file_path
+    if PersistentVars.saveIdentifier then
+        --Save specific list
+        sellPath = "sell_list_id_"..PersistentVars.saveIdentifier
+    end
+    return sellPath
+end
 
+---Initialize the configuration file and save it
+---@param filePath string path to the configuration file
+---@param defaultConfig any our default_config_tbl
 function Config.InitDefaultConfig(filePath, defaultConfig)
     BasicDebug("Config.InitDefaultConfig() - Creating default config file at :" .. filePath)
     Config.SaveConfig(filePath, defaultConfig)
 end
-
+---Initialize a filter list and save it
+---@param filePath string path to the list
+---@param list table the list to initialize
 function Config.InitDefaultFilterList(filePath, list)
     BasicDebug("Config.InitDefaultFilterList() - Creating default filter list file at :" .. filePath)
     Config.SaveConfig(filePath, list)
 end
 
 function Config.LoadUserLists()
+    local sellPath,keepPath=Config.GetSellPath(),Config.keeplist_json_file_path
     BasicPrint("Config.LoadUserLists() - Loading user filter lists...")
-    Config.keeplist = Config.LoadConfig(Config.keeplist_json_file_path)
+    Config.keeplist = Config.LoadConfig(keepPath)
     -- In theory, this isn't possible since we call EnsureAllListsExist before but you never know...
     if not Config.keeplist then
         BasicError("Config.LoadUserLists() - keeplist wasn't valid, generating a blank one...")
-        Config.InitDefaultFilterList(Config.keeplist_json_file_path, Config.default_keep)
+        Config.InitDefaultFilterList(keepPath,Config.default_keep)
     end
-    Config.selllist = Config.LoadConfig(Config.selllist_json_file_path)
+    Config.selllist = Config.LoadConfig(sellPath)
     if not Config.selllist then
         BasicError("Config.LoadUserLists() - selllist wasn't valid, generating a blank one...")
-        Config.InitDefaultFilterList(Config.selllist_json_file_path, Config.default_sell)
+        Config.InitDefaultFilterList(sellPath, Config.default_sell)
     end
     BasicPrint("Config.LoadUserLists() - User lists loaded!")
 end
