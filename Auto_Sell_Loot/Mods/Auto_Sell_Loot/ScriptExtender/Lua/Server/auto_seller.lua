@@ -83,7 +83,9 @@ function ResolveMessagesHandles()
         message_user_list_only = Osi.ResolveTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
         message_save_specific_list = Osi.ResolveTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
         message_save_specific_list_already_exist = Osi.ResolveTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
-        message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca")
+        message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
+        message_disable_mod = Osi.ResolveTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
+        message_enable_mod = Osi.ResolveTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8")
     }
     return Messages
 end
@@ -260,11 +262,10 @@ end
 
 -- Loading is done Update SQUADIES and create the JUNKTABLESET from the base junk list and our sell & keep list
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, isEditorMode)
+    Messages = ResolveMessagesHandles()
     if level == "SYS_CC_I" then return end
     if not Config.initDone then Config.Init() end
-
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 1 then
-        Messages=ResolveMessagesHandles()
         SQUADIES = GetSquadies()
         -- Add the bag(s) to the host char if none found in party inventory
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
@@ -386,7 +387,11 @@ end)
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
         if damageAmount == 0 and string.sub(attackerOwner, -36) == Osi.GetHostCharacter() and string.sub(defender, -36) == SELL_ADD_BAG_ITEM then
-            Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
+            if Config.config_tbl.MOD_ENABLED == 1 then
+                Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
+            else
+                Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_enable_mod)
+            end
         end
     end)
 
@@ -396,12 +401,12 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         if result == 1 then
             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
         end
-    --Config Sell mode only
+        --Config Sell mode only
     elseif message == Messages.message_bag_sell_mode then
         Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", result)
         Config.SaveConfig()
         Osi.OpenMessageBoxYesNo(character, Messages.message_user_list_only)
-    --Config user list only
+        --Config user list only
     elseif message == Messages.message_user_list_only then
         Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", result)
         Config.SaveConfig()
@@ -410,36 +415,47 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         else
             Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list)
         end
-    --Config save specific list
+        --Config save specific list
     elseif message == Messages.message_save_specific_list then
         --Create id for this save
         if result == 1 and not PersistentVars.saveIdentifier then
             local random = Ext.Math.Random(0, 999999999)
             PersistentVars.saveIdentifier = random
-            PersistentVars.useSaveSpecificSellList=true
+            PersistentVars.useSaveSpecificSellList = true
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
             Config.LoadUserLists()
-        --Id already exists so we're just turning it on back
+            --Id already exists so we're just turning it on back
         elseif result == 1 and PersistentVars.saveIdentifier then
-            PersistentVars.useSaveSpecificSellList=true
+            PersistentVars.useSaveSpecificSellList = true
             Config.LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-    --Config save specific list already exist
+        --Config save specific list already exist
     elseif message == Messages.message_save_specific_list_already_exist then
         if result == 1 then
-            PersistentVars.useSaveSpecificSellList=false
+            PersistentVars.useSaveSpecificSellList = false
             Config.LoadUserLists()
         else
             --do nothing
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-    --Config clear list
+        --Config clear list
     elseif message == Messages.message_clear_sell_list then
         if result == 1 then
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
         else
             --do nothing
         end
+    Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
+    --disable mod
+    elseif message == Messages.message_disable_mod then
+        local choice=1
+        if result == 1 then choice = 0 else choice = 1 end
+        Config.SetValue(Config.config_tbl, "MOD_ENABLED", choice)
+        Config.SaveConfig()
+    --Re enable mod
+    elseif message == Messages.message_enable_mod then
+        Config.SetValue(Config.config_tbl, "MOD_ENABLED", result)
+        Config.SaveConfig()
     end
 end)

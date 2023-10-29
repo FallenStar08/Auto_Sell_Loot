@@ -1,12 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentList>
 	<content contentuid="hbbb9dc98g5791g4c49gab6dg0ee36d9db4c4" version="1">La Merveilleuse Sacoche du Commerce</content>
-	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Faites glisser les objets dans la sacoche pour les ajouter à la liste des objets automatiquement vendus.
-- Ouvrez la sacoche pour modifier votre liste.
-- Enlever un objet de la sacoche en mode édition le supprimera de la liste.
-- La liste est enregistrée à la fermeture de la sacoche</content>
+	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Faites glisser et déposez des objets dans le sac pour les ajouter à la liste des articles vendus automatiquement.
+- Ouvrez le sac pour modifier votre liste.
+- Retirer un objet du sac en mode édition le retirera de la liste et l'enregistrera.
+- La liste est enregistrée lorsque vous fermez le sac.
+- Frappez le sac au sol pour commencer la configuration du mod.</content>
+
 	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">Sous la magie, l'objet s'évanouit en mélodie légère,
 Une grâce dorée surgit, offrant richesse éphémère.
 Pour l'aventurier pressé, c'est un trésor à la clé,
 Un chemin vers la fortune, qu'il poursuit sans arrêt.</content>
+	<content contentuid="h995d430eg9629g40c8g9470g6f515582195b" version="1">Vous êtes sur le point de commencer la configuration du mod de vente automatique.&lt;br&gt; Veuillez ne pas appuyer sur la touche Échap et examiner attentivement les options disponibles.&lt;br&gt; Appuyez sur "OUI" pour lancer la configuration ou sur "NON" pour annuler.</content>
+	<content contentuid="h70fb978cg63cbg44d2ga45eg89bcacb356c8" version="1">Souhaitez-vous activer le mode "vente uniquement" pour le sac ?&lt;br&gt; Si vous activez cette option, les objets que vous faites glisser dans le sac ne seront pas automatiquement ajoutés à votre liste de vente.</content>
+	<content contentuid="hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae" version="1">Voulez-vous utiliser exclusivement votre liste de vente personnelle ?&lt;br&gt; En activant cette option, le mod n'utilisera pas sa liste d'objets inutiles interne, seuls les objets que vous ajoutez manuellement au sac seront automatiquement vendus.</content>
+	<content contentuid="h5172487eg9d0eg4c06g93e3g5badf1e9401c" version="1">Voulez-vous créer une liste de vente spécifique à cette sauvegarde ?&lt;br&gt; En activant cette option, votre liste personnelle sera liée à cette sauvegarde.&lt;br&gt; Veuillez noter que cela générera une nouvelle liste vide spécifique à cette sauvegarde.&lt;br&gt; Si vous l'avez déjà activée ou si vous souhaitez la réactiver, cliquez sur "OUI".</content>
+	<content contentuid="hbc85062bg1b97g4150g9d31gacac9018d58b" version="1">Vous utilisez actuellement une liste de vente personnelle spécifique à la sauvegarde.&lt;br&gt; Souhaitez-vous revenir à l'utilisation de la liste de vente personnelle globale ?&lt;br&gt; Votre liste spécifique à la sauvegarde sera conservée et pourra être réactivée ultérieurement si vous le souhaitez.</content>
+	<content contentuid="hd5b72a24g4401g4986gae60g9db54155f4ca" version="1">Souhaitez-vous effacer votre liste de vente personnelle ?</content>
+	<content contentuid="he488aa70g5d71g4c0egaf5cg68ac3804b28d" version="1">Désactiver le mod ?&lt;br&gt; Vous pouvez le réactiver ultérieurement en frappant à nouveau le sac.</content>
+	<content contentuid="hc28d17e2g37b5g4978gb1c6g56d048969ab8" version="1">Réactiver le mod ?</content>
 </contentList>
