@@ -400,6 +400,8 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     if message == Messages.message_warning_config_start then
         if result == 1 then
             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
+        else
+            if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
         end
         --Config Sell mode only
     elseif message == Messages.message_bag_sell_mode then
@@ -446,16 +448,18 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         else
             --do nothing
         end
-    Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
-    --disable mod
+        Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
+        --disable mod
     elseif message == Messages.message_disable_mod then
-        local choice=1
+        local choice = 1
         if result == 1 then choice = 0 else choice = 1 end
         Config.SetValue(Config.config_tbl, "MOD_ENABLED", choice)
         Config.SaveConfig()
-    --Re enable mod
+        if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
+        --Re enable mod
     elseif message == Messages.message_enable_mod then
         Config.SetValue(Config.config_tbl, "MOD_ENABLED", result)
         Config.SaveConfig()
+        if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
     end
 end)
