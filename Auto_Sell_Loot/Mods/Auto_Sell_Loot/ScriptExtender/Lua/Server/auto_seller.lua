@@ -30,6 +30,8 @@ Messages = {
     "Do you want to only use your personal sell list? \n if this is enabled the mod won't use its internal junk list.",
     message_save_specific_list =
     "Do you want to use a save specific sell list for this save? \n if this is enabled your personal list will be tied to this save file. \n WARNING THIS WILL CREATE A NEW EMPTY LIST SPECIFIC TO THIS SAVE FILE! IF THIS IS ALREADY ENABLED CLICK YES",
+    message_save_specific_list_already_exist =
+    "You are currently using a save specific personal sell list, do you want to go back to using the global personal sell list?",
     message_clear_sell_list =
     "Do you want to clear your personal sell list?"
 }
@@ -385,40 +387,59 @@ end)
 
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
-        if attackerOwner == Osi.GetHostCharacter() and defender == SELL_ADD_BAG_ITEM then
+        if damageAmount == 0 and string.sub(attackerOwner, -36) == Osi.GetHostCharacter() and string.sub(defender, -36) == SELL_ADD_BAG_ITEM then
             Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
         end
     end)
 
 Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
+    --Config Start
     if message == Messages.message_warning_config_start then
         if result == 1 then
             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
         end
+    --Config Sell mode only
     elseif message == Messages.message_bag_sell_mode then
-        if result == 1 then
-            Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", 1)
-        else
-            Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", 0)
-        end
-    Config.SaveConfig()
-    Osi.OpenMessageBoxYesNo(character, Messages.message_user_list_only)
+        Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", result)
+        Config.SaveConfig()
+        Osi.OpenMessageBoxYesNo(character, Messages.message_user_list_only)
+    --Config user list only
     elseif message == Messages.message_user_list_only then
-        if result == 1 then
-            Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", 1)
+        Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", result)
+        Config.SaveConfig()
+        if PersistentVars.useSaveSpecificSellList == true then
+            Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list_already_exist)
         else
-            Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", 0)
+            Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list)
         end
-    Config.SaveConfig()
-    Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list)
+    --Config save specific list
     elseif message == Messages.message_save_specific_list then
+        --Create id for this save
         if result == 1 and not PersistentVars.saveIdentifier then
-            table.insert(PersistentVars, { saveIdentifier = Ext.Math.Random(0, 999999999) })
+            local random = Ext.Math.Random(0, 999999999)
+            PersistentVars.saveIdentifier = random
+            PersistentVars.useSaveSpecificSellList=true
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
+            Config.LoadUserLists()
+        --Id already exists so we're just turning it on back
+        elseif result == 1 and PersistentVars.saveIdentifier then
+            PersistentVars.useSaveSpecificSellList=true
+        --shouldn't be possible to get there
         elseif result == 0 and PersistentVars.saveIdentifier then
-            PersistentVars.saveIdentifier = nil
+            PersistentVars.useSaveSpecificSellList=false
+            Config.LoadUserLists()
         end
-    Osi.OpenMessageBoxYesNo(character,Messages.message_clear_sell_list)
+        Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
+    --Config save specific list already exist
+    elseif message == Messages.message_save_specific_list_already_exist then
+        if result == 1 then
+            PersistentVars.useSaveSpecificSellList=false
+            Config.LoadUserLists()
+        else
+            --do nothing
+        end
+        Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
+    --Config clear list
     elseif message == Messages.message_clear_sell_list then
         if result == 1 then
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)

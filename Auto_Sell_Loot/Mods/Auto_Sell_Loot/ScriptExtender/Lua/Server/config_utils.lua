@@ -193,9 +193,9 @@ end
 ---@return string sellPath the path to our sell list
 function Config.GetSellPath()
     local sellPath=Config.selllist_json_file_path
-    if PersistentVars.saveIdentifier then
+    if PersistentVars.useSaveSpecificSellList == true then
         --Save specific list
-        sellPath = "sell_list_id_"..PersistentVars.saveIdentifier
+        sellPath = "sell_list_id_"..PersistentVars.saveIdentifier..".json"
     end
     return sellPath
 end
