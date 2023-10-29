@@ -192,11 +192,13 @@ end
 ---Get the path to our selll list in case it's a save specific one
 ---@return string sellPath the path to our sell list
 function Config.GetSellPath()
+    BasicDebug("GetSellPath()")
     local sellPath=Config.selllist_json_file_path
     if PersistentVars.useSaveSpecificSellList == true then
         --Save specific list
         sellPath = "sell_list_id_"..PersistentVars.saveIdentifier..".json"
     end
+    BasicDebug(string.format("GetSellPath() - Sell path : %s",sellPath))
     return sellPath
 end
 

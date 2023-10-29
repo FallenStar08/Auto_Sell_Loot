@@ -90,6 +90,19 @@ function ResolveMessagesHandles()
     return Messages
 end
 
+function DelayedCall(ms, func)
+    local Time = 0
+    local handler
+    handler = Ext.Events.Tick:Subscribe(function(e)
+        Time = Time + e.Time.DeltaTime
+
+        if (Time >= ms) then
+            Ext.Events.Tick:Unsubscribe(handler)
+            func()
+        end
+    end)
+end
+
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
