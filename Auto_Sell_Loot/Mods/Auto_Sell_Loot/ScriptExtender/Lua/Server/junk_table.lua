@@ -809,5 +809,6 @@ local junkTable = {
   ["UNI_WYR_Thiefling_HolyHandSoap"] = "42d56907-aa68-4f77-a024-3789c323214d",
   ["WPN_Grenade_BloodSurface"] = "7821978d-c720-4651-9693-936960145636",
   ["WYR_FfionRing"] = "18c6beaf-e553-462d-aa59-74b5ff1adb1c",
+  ['S_PLA_DyingHyena_Body_Part_Guts_A'] = '717edab5-038b-49f3-b1d3-ca61cf342e05',
 }
 return junkTable
