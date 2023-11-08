@@ -42,11 +42,11 @@ local function ConcatOutput(...)
     return outStr
 end
 
--- Function to print text with custom colors, message type, and custom prefix
-function BasicPrint(content, messageType, textColor, customPrefix)
-
+-- Function to print text with custom colors, message type, custom prefix, rainbowText ,and prefix length
+function BasicPrint(content, messageType, textColor, customPrefix, rainbowText, prefixLength)
+    prefixLength=prefixLength or 15
     messageType = messageType or "INFO"
-    local textColorCode = textColor or TEXT_COLORS.cyan-- Default to cyan
+    local textColorCode = textColor or TEXT_COLORS.cyan -- Default to cyan
     customPrefix = customPrefix or MOD_NAME
 
     if Config.config_tbl.LOG_ENABLED == 1 then
@@ -58,13 +58,13 @@ function BasicPrint(content, messageType, textColor, customPrefix)
     end
 
     if PrintTypes[messageType] and DEBUG_MESSAGES >= PrintTypes[messageType] then
-        local message = ConcatOutput(ConcatPrefix(customPrefix .. "  [" .. messageType .. "]", content))
-        local coloredMessage = string.format("\x1b[%dm%s\x1b[0m", textColorCode, message)
-
+        local padding = string.rep(" ", prefixLength - #customPrefix)
+        local message = ConcatOutput(ConcatPrefix(customPrefix .. padding .. "  [" .. messageType .. "]", content))
+        local coloredMessage = rainbowText and GetRainbowText(message) or string.format("\x1b[%dm%s\x1b[0m", textColorCode, message)
         if messageType == "ERROR" then
-            printError(message)
+            printError(coloredMessage)
         elseif messageType == "WARNING" then
-            printWarning(message)
+            printWarning(coloredMessage)
         else
             print(coloredMessage)
         end
@@ -81,6 +81,17 @@ end
 
 function BasicDebug(content)
     BasicPrint(content, "DEBUG")
+end
+
+function GetRainbowText(text)
+    local colors = { "31", "33", "32", "36", "35", "34" } -- Red, Yellow, Green, Cyan, Magenta, Blue
+    local coloredText = ""
+    for i = 1, #text do
+        local char = text:sub(i, i)
+        local color = colors[i % #colors + 1]
+        coloredText = coloredText .. string.format("\x1b[%sm%s\x1b[0m", color, char)
+    end
+    return coloredText
 end
 
 -- ------------------------------------------------------------------------------------------------------
@@ -310,7 +321,7 @@ function GetSquadies()
             BasicDebug("Ignoring dummy")
         end
     end
-    SQUADIES=squadies
+    SQUADIES = squadies
     return squadies
 end
 
@@ -322,7 +333,7 @@ function GetSummonies()
             table.insert(summonies, summon[1])
         end
     end
-    SUMMONIES=summonies
+    SUMMONIES = summonies
     return summonies
 end
 

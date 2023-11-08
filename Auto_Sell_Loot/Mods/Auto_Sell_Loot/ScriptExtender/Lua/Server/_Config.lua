@@ -222,7 +222,7 @@ function Config.Init()
     Files.ClearLogFile()
     -- Until we read the user's log level just pretend it's the default one
     DEBUG_MESSAGES = Config.default_config_tbl["DEBUG_MESSAGES"]
-    BasicPrint("Config.Init() - Automatic loot seller by FallenStar VERSION : "..Config.CurrentVersion.." starting up... ")
+    BasicPrint(string.format("Config.Init() - %s mod by FallenStar VERSION : %s starting up... ",MOD_NAME,Config.CurrentVersion),"INFO",nil,nil,true)
     local loadedConfig = Files.Load(Config.config_json_file_path)
     -- Check if the config file doesn't exist, Initialize it
     if not loadedConfig then Config.InitDefaultConfig(Config.config_json_file_path, Config.default_config_tbl) end

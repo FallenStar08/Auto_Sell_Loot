@@ -166,7 +166,7 @@ function Bags.FindBagItemFromTemplate()
         for _, player in pairs(SQUADIES) do
             if Osi.TemplateIsInInventory(SELL_ADD_BAG_ROOT, player) >= 1 then
                 SELL_ADD_BAG_ITEM = Osi.GetItemByTemplateInInventory(SELL_ADD_BAG_ROOT, player)
-                BasicPrint("FindBagItemFromTemplate() Selling bag UUID found :" .. SELL_ADD_BAG_ITEM)
+                BasicPrint("FindBagItemFromTemplate() Selling bag UUID found : " .. SELL_ADD_BAG_ITEM)
             end
         end
         return SELL_ADD_BAG_ITEM
