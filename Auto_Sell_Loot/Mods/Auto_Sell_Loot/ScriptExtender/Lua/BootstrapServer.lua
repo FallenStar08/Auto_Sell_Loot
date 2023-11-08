@@ -1,1 +1,1 @@
-Ext.Require("Server/auto_seller.lua")
+Ext.Require("Server/main.lua")

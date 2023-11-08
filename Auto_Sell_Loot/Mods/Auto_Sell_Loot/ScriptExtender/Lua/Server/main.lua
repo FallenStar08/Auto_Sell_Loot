@@ -1,58 +1,21 @@
 JUNKTABLE = Ext.Require("Server/junk_table.lua")
-Ext.Require("Server/IO_utils.lua")
-Ext.Require("Server/config_utils.lua")
-Ext.Require("Server/log_utils.lua")
-Ext.Require("Server/table_utils.lua")
-
+Ext.Require("Server/_ModInfos.lua")
+Ext.Require("Server/_Globals.lua")
+Ext.Require("Server/_Utils.lua")
+Ext.Require("Server/_Config.lua")
 -- -------------------------------------------------------------------------- --
 --                                   GLOBALS                                  --
 -- -------------------------------------------------------------------------- --
-
-Bags = {
-
-}
-PersistentVars = {}
-SELL_ADD_BAG_ROOT = "93165800-7962-4dec-96dc-1310129f6620"
-GOLD = "1c3c9c74-34a1-4685-989e-410dc080be6f"
-SELL_ADD_BAG_ITEM = ""
-SQUADIES = {}
+Bags = {}
 SELL_VALUE_COUNTER = 0
 FRACTIONAL_PART = 0
 SEll_LIST_EDIT_MODE = false
-DURGY_ROOT = "DragonBorn_Male_OriginIntro_dca00de8-eb34-49b5-b65f-668cdf75116b"
-
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
 
--- Function to retrieve the list of squad members (The ones in the party at least)
-function GetSquadies()
-    local squadies = {}
-    local players = Osi.DB_Players:Get(nil)
-    for _, player in pairs(players) do table.insert(squadies, player[1]) end
-    return squadies
-end
-
 function GetItemName(item)
     return string.sub(item, 1, -38)
-end
-
---for the weird _xxx at the end of some items UUIDs
-function RemoveTrailingNumbers(inputString)
-    return inputString:gsub("_%d%d%d$", "")
-end
-
---Fuck you whoever made me add this garbage
-function StringEmpty(str)
-    return not string.match(str, "%S")
-end
-
-function AddGoldTo(Character, Amount)
-    Osi.TemplateAddTo(GOLD, Character, Amount)
-end
-
-function RemoveGoldFrom(Character, Amount)
-    Osi.TemplateRemoveFrom(GOLD, Character, Amount)
 end
 
 function DeleteItem(Character, Item, Amount)
@@ -88,19 +51,6 @@ function ResolveMessagesHandles()
         message_enable_mod = Osi.ResolveTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8")
     }
     return Messages
-end
-
-function DelayedCall(ms, func)
-    local Time = 0
-    local handler
-    handler = Ext.Events.Tick:Subscribe(function(e)
-        Time = Time + e.Time.DeltaTime
-
-        if (Time >= ms) then
-            Ext.Events.Tick:Unsubscribe(handler)
-            func()
-        end
-    end)
 end
 
 -- -------------------------------------------------------------------------- --

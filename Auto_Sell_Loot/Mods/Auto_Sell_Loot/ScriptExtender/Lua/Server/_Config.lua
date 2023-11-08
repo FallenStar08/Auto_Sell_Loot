@@ -1,22 +1,6 @@
-Config = {}
-Config.initDone = false
---Lazy
-Config.config_tbl = {MOD_ENABLED = 1}
 Config.selllist = {}
 Config.keeplist = {}
 
-Config.config_json_file_path = "config.json"
-Config.junk_table_json_file_path = "junk_list.json"
-Config.keeplist_json_file_path = "keep_list.json"
-Config.selllist_json_file_path = "sell_list.json"
-Config.logPath = "logs.txt"
-
-FolderName = "Fall_AutoSeller"
-MODVERSION=Ext.Mod.GetMod("0662253d-1cbf-479f-80c2-5878c6eb5a80").Info.ModVersion
-Config.CurrentVersion = MODVERSION[1].."."..MODVERSION[2].."."..MODVERSION[3].."."..MODVERSION[4]
--- TODO basically log level selector, rename it later
-DEBUG_MESSAGES = 3
--- TODO REMINDER use string.format for everything
 -- -------------------------------------------------------------------------- --
 --                               Default tables                               --
 -- -------------------------------------------------------------------------- --
