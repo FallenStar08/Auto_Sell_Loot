@@ -810,5 +810,6 @@ local junkTable = {
   ["WPN_Grenade_BloodSurface"] = "7821978d-c720-4651-9693-936960145636",
   ["WYR_FfionRing"] = "18c6beaf-e553-462d-aa59-74b5ff1adb1c",
   ['S_PLA_DyingHyena_Body_Part_Guts_A'] = '717edab5-038b-49f3-b1d3-ca61cf342e05',
+  ['DEC_Goblins_Camp_CookingPot_Ladle'] = '6c43dbd3-ce2a-4570-a8dd-78f551e0e958'
 }
 return junkTable
