@@ -812,5 +812,6 @@ local junkTable = {
   ['S_PLA_DyingHyena_Body_Part_Guts_A'] = '717edab5-038b-49f3-b1d3-ca61cf342e05',
   ['DEC_Goblins_Camp_CookingPot_Ladle'] = '6c43dbd3-ce2a-4570-a8dd-78f551e0e958',
   ['DEC_GEN_KitchenInstrument_Cup_C_Wood_A'] = '2add6f00-eb1c-4f86-bf7f-73e2c68ad5de',
+  ['CONS_Drink_Wine_Bottle_A'] = '56813fb8-5862-4de7-9a11-5cc5b4160753',
 }
 return junkTable
