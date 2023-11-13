@@ -1,5 +1,5 @@
 {
-    "RequiredVersion": 6,
+    "RequiredVersion": 10,
     "ModTable": "Auto_Sell_Loot",
     "FeatureFlags": ["Lua"]
 }

@@ -71,16 +71,16 @@ function BasicPrint(content, messageType, textColor, customPrefix, rainbowText, 
     end
 end
 
-function BasicError(content)
-    BasicPrint(content, "ERROR")
+function BasicError(content, textColor)
+    BasicPrint(content, "ERROR", textColor)
 end
 
-function BasicWarning(content)
-    BasicPrint(content, "WARNING")
+function BasicWarning(content, textColor)
+    BasicPrint(content, "WARNING", textColor)
 end
 
-function BasicDebug(content)
-    BasicPrint(content, "DEBUG")
+function BasicDebug(content, textColor)
+    BasicPrint(content, "DEBUG", textColor)
 end
 
 function GetRainbowText(text)
@@ -366,4 +366,12 @@ end
 
 function RemoveGoldFrom(Character, Amount)
     Osi.TemplateRemoveFrom(GOLD, Character, Amount)
+end
+
+function UpdateTranslatedString(handle,content)
+    Ext.Loca.UpdateTranslatedString(handle,content)
+end
+
+function GetTranslatedString(handle)
+    return Ext.Loca.GetTranslatedString(handle)
 end

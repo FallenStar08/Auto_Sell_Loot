@@ -53,6 +53,19 @@ function ResolveMessagesHandles()
     return Messages
 end
 
+function UpdateBagInfoScreenWithConfig()
+    local handle="he671bb1egab4fg4f2bg981egdd0b1e8585af"
+    local content = string.format("Mod settings : \n - Bag Sell Mode Only : %s\n - User List Only : %s\n - Save Specific List : %s\n - Save Identifier : %s",
+    tostring(Config.config_tbl.BAG_SELL_MODE_ONLY == 1),
+    tostring(Config.config_tbl.CUSTOM_LISTS_ONLY == 1),
+    tostring(PersistentVars.useSaveSpecificSellList) or "not enabled",
+    tostring(PersistentVars.saveIdentifier) or "not enabled"
+    )
+    BasicDebug("UpdateBagInfoScreenWithConfig() - content : "..content,TEXT_COLORS.magenta)
+    UpdateTranslatedString(handle,content)
+end
+
+
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
@@ -244,6 +257,7 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, 
         if Config.config_tbl.ENABLE_LOGGING == 1 then
             Files.FlushLogBuffer()
         end
+        UpdateBagInfoScreenWithConfig()
     end
 end)
 
@@ -425,4 +439,5 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         Config.SaveConfig()
         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
     end
+    UpdateBagInfoScreenWithConfig()
 end)
