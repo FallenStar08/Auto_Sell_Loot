@@ -83,7 +83,7 @@ function Config.SetValue(config, key, value)
     config[key] = value
 end
 
----Ensure all of our lists exist and create them if not, also validate their structure
+---Ensure all of our lists exist and create them if not, also validate their structure.
 function EnsureAllListsExist()
     BasicPrint("EnsureAllListsExist() - Doing the ensuring")
     local sellExists,keepExists,junkExists = false,false,false
