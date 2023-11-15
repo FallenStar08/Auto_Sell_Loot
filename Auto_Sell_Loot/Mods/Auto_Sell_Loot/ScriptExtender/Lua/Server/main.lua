@@ -278,13 +278,14 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
     local rootName = GetItemName(root)
     root = string.sub(root, -36)
+    inventoryHolder = string.sub(inventoryHolder, -36)
     if root == GOLD or root == SELL_ADD_BAG_ROOT then return end --Ignore gold & bag
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
 
     Bags.FindBagItemFromTemplate()
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
-        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
+        if inventoryHolder == SELL_ADD_BAG_ITEM then
             local itemUUID = string.sub(item, -36)
             Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
             Ext.Entity.Get(itemUUID):GetComponent("Value").Value = 0
@@ -298,11 +299,11 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 
     --Draggidy dropped onto the baggy, addy to the sell listy
-    if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+    if inventoryHolder == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
 
     --Specific to BAG SELL MODE ONLY
     if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then
-        if string.sub(inventoryHolder, -36) == SELL_ADD_BAG_ITEM then
+        if inventoryHolder == SELL_ADD_BAG_ITEM then
             local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
             HandleSelling(char, inventoryHolder, root, item)
             return
