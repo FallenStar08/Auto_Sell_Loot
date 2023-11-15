@@ -1,7 +1,7 @@
 JUNKTABLE = Ext.Require("Server/junk_table.lua")
 Ext.Require("Server/_ModInfos.lua")
-Ext.Require("Server/_Globals.lua")
-Ext.Require("Server/_Utils.lua")
+Ext.Require("Shared/_Globals.lua")
+Ext.Require("Shared/_Utils.lua")
 Ext.Require("Server/_Config.lua")
 -- -------------------------------------------------------------------------- --
 --                                   GLOBALS                                  --
