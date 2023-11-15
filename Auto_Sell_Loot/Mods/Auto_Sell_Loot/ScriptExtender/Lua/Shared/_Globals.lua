@@ -1,1 +1,0 @@
-F:/Mods/BG3-mods/SharedCode/_Globals.lua
