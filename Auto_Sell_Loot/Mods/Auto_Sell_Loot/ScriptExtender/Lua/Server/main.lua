@@ -13,11 +13,11 @@ SEll_LIST_EDIT_MODE = false
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
-
+--TODO find out what this prefix is actually called
 function GetItemName(item)
     return string.sub(item, 1, -38)
 end
-
+--TODO uncringe this
 function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
     BasicDebug("DeleteItem() - function called on Character : " ..
@@ -39,6 +39,7 @@ function IsTransmogInvisible(ItemName, Item)
     return false
 end
 
+--Resolve our translated string
 function ResolveMessagesHandles()
     local Messages = {
         message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
@@ -53,6 +54,7 @@ function ResolveMessagesHandles()
     return Messages
 end
 
+--Update bag description with mod infos
 function UpdateBagInfoScreenWithConfig()
     local handle="he671bb1egab4fg4f2bg981egdd0b1e8585af"
     local content = string.format("Mod settings : \n - Bag Sell Mode Only : %s\n - User List Only : %s\n - Save Specific List : %s\n - Save Identifier : %s",
