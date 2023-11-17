@@ -444,3 +444,31 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     end
     UpdateBagInfoScreenWithConfig()
 end)
+
+
+-- -------------------------------------------------------------------------- --
+--                                   TESTING                                  --
+-- -------------------------------------------------------------------------- --
+
+Ext.Events.ResetCompleted:Subscribe(function()
+    Messages = ResolveMessagesHandles()
+    if not Config.initDone then Config.Init() end
+    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 1 then
+        SQUADIES = GetSquadies()
+        -- Add the bag(s) to the host char if none found in party inventory
+        Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
+        SELL_VALUE_PERCENTAGE = Config.GetValue(Config.config_tbl, "SELL_VALUE_PERCENTAGE")
+        BasicDebug("SELL_VALUE_PERCENTAGE : " .. SELL_VALUE_PERCENTAGE)
+        -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
+        BasicDebug(Config.keeplist)
+        BasicDebug(Config.selllist)
+        local keepList = Config.GetValue(Config.keeplist, "KEEPLIST")
+        local sellList = Config.GetValue(Config.selllist, "SELLLIST")
+        JUNKTABLESET = Table.ProcessTables(JUNKTABLE, keepList, sellList)
+        Bags.FindBagItemFromTemplate()
+        if Config.config_tbl.ENABLE_LOGGING == 1 then
+            Files.FlushLogBuffer()
+        end
+        UpdateBagInfoScreenWithConfig()
+    end
+end)
