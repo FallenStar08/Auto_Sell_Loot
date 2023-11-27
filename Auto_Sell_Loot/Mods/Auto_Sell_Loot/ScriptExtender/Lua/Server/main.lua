@@ -89,7 +89,7 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         local itemName = GetItemName(guid)
         if not StringEmpty(itemName) then
             local template = Osi.GetTemplate(guid)
-            REMOVER_BAG_CONTENT_LIST[itemName] = UUID(template)
+            REMOVER_BAG_CONTENT_LIST[itemName] = GUID(template)
         end
     elseif id == "AS_bagItems_Done" then
         -- Do this in a function, or don't
@@ -124,7 +124,7 @@ end)
 
 -- Listen for item uses, in this case the opening of our bag counts as it being used
 Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
-    item = UUID(item)
+    item = GUID(item)
     if not SELL_ADD_BAG_ITEM then Bags.FindBagItemFromTemplate() end
     if item == SELL_ADD_BAG_ITEM then
         SEll_LIST_EDIT_MODE = true
@@ -138,7 +138,7 @@ end)
 
 -- Listener for item uses stop, in this case the closing of our bag counts as it not being used anymore
 Ext.Osiris.RegisterListener("UseFinished", 3, "after", function(character, item, sucess)
-    item = UUID(item)
+    item = GUID(item)
     if SEll_LIST_EDIT_MODE == true and item == SELL_ADD_BAG_ITEM then
         Osi.ShowNotification(character, "AUTOSELL - EDIT MODE OFF")
         Bags.AddContentToList(SELL_ADD_BAG_ITEM, character)
@@ -305,8 +305,8 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 
     local rootName = GetItemName(root)
-    root = UUID(root)
-    inventoryHolder = UUID(inventoryHolder)
+    root = GUID(root)
+    inventoryHolder = GUID(inventoryHolder)
 
     if root == GOLD or root == SELL_ADD_BAG_ROOT then
         return -- Ignore gold & bag
@@ -320,7 +320,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
         if inventoryHolder == SELL_ADD_BAG_ITEM then
-            setZeroWeightAndValue(UUID(item))
+            setZeroWeightAndValue(GUID(item))
             --TODO Do something to trigger a refresh of the weight here
             --TODO probably add/remove an item to the bag
             return
@@ -367,7 +367,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         end
 
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
-            local itemUUID = UUID(item)
+            local itemUUID = GUID(item)
             if Osi.IsContainer(itemUUID) == 1 then
                 Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
             end
@@ -397,7 +397,7 @@ end)
 
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
-        if damageAmount == 0 and UUID(attackerOwner) == Osi.GetHostCharacter() and UUID(defender) == SELL_ADD_BAG_ITEM then
+        if damageAmount == 0 and GUID(attackerOwner) == Osi.GetHostCharacter() and GUID(defender) == SELL_ADD_BAG_ITEM then
             if Config.config_tbl.MOD_ENABLED == 1 then
                 Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
             else
