@@ -17,6 +17,7 @@ SEll_LIST_EDIT_MODE = false
 function GetItemName(item)
     return string.sub(item, 1, -38)
 end
+
 --TODO uncringe this debug message
 function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
@@ -57,17 +58,19 @@ end
 
 --Update bag description with mod infos
 function UpdateBagInfoScreenWithConfig()
-    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or "not enabled"
+    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or
+        "not enabled"
     local saveIdentifier = PersistentVars.saveIdentifier and PersistentVars.saveIdentifier or "not enabled"
 
     local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
-    
+
     local bagSellModeOnly = tostring(Config.config_tbl.BAG_SELL_MODE_ONLY == 1)
     local userListOnly = tostring(Config.config_tbl.CUSTOM_LISTS_ONLY == 1)
-    
-    local content = string.format("Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s",
-        bagSellModeOnly, 
-        userListOnly, 
+
+    local content = string.format(
+        "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s",
+        bagSellModeOnly,
+        userListOnly,
         useSaveSpecificSellList,
         saveIdentifier
     )
@@ -75,7 +78,6 @@ function UpdateBagInfoScreenWithConfig()
     BasicDebug("UpdateBagInfoScreenWithConfig() - content: " .. content, TEXT_COLORS.magenta)
     UpdateTranslatedString(handle, content)
 end
-
 
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
@@ -87,7 +89,7 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         local itemName = GetItemName(guid)
         if not StringEmpty(itemName) then
             local template = Osi.GetTemplate(guid)
-            REMOVER_BAG_CONTENT_LIST[itemName] = string.sub(template, -36)
+            REMOVER_BAG_CONTENT_LIST[itemName] = UUID(template)
         end
     elseif id == "AS_bagItems_Done" then
         -- Do this in a function, or don't
@@ -122,7 +124,7 @@ end)
 
 -- Listen for item uses, in this case the opening of our bag counts as it being used
 Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
-    item = string.sub(item, -36)
+    item = UUID(item)
     if not SELL_ADD_BAG_ITEM then Bags.FindBagItemFromTemplate() end
     if item == SELL_ADD_BAG_ITEM then
         SEll_LIST_EDIT_MODE = true
@@ -136,7 +138,7 @@ end)
 
 -- Listener for item uses stop, in this case the closing of our bag counts as it not being used anymore
 Ext.Osiris.RegisterListener("UseFinished", 3, "after", function(character, item, sucess)
-    item = string.sub(item, -36)
+    item = UUID(item)
     if SEll_LIST_EDIT_MODE == true and item == SELL_ADD_BAG_ITEM then
         Osi.ShowNotification(character, "AUTOSELL - EDIT MODE OFF")
         Bags.AddContentToList(SELL_ADD_BAG_ITEM, character)
@@ -285,23 +287,40 @@ end)
 
 -- Includes moving from container to other inventories etc...
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
-    if not Config.initDone then return end                                    --Somehow got there before Init (probably new game stuff)
-    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then return end -- Mod Disabled
+    if not Config.initDone or Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then
+        return -- Ignore if initialization not done or mod is disabled
+    end
+    local function setZeroWeightAndValue(itemUUID)
+        local entity = Ext.Entity.Get(itemUUID)
+        if entity then
+            local dataComp = entity:GetComponent("Data")
+            local valueComp = entity:GetComponent("Value")
+            if dataComp and valueComp then
+                dataComp.Weight = 0
+                valueComp.Value = 0
+                entity:Replicate("Data")
+                entity:Replicate("Value")
+            end
+        end
+    end
+
     local rootName = GetItemName(root)
-    root = string.sub(root, -36)
-    inventoryHolder = string.sub(inventoryHolder, -36)
-    if root == GOLD or root == SELL_ADD_BAG_ROOT then return end --Ignore gold & bag
+    root = UUID(root)
+    inventoryHolder = UUID(inventoryHolder)
+
+    if root == GOLD or root == SELL_ADD_BAG_ROOT then
+        return -- Ignore gold & bag
+    end
+
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
+
     --Sanity check
     Bags.FindBagItemFromTemplate()
+
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
         if inventoryHolder == SELL_ADD_BAG_ITEM then
-            local itemUUID = string.sub(item, -36)
-            Ext.Entity.Get(itemUUID):GetComponent("Data").Weight = 0
-            Ext.Entity.Get(itemUUID):GetComponent("Value").Value = 0
-            Ext.Entity.Get(itemUUID):Replicate("Data")
-            Ext.Entity.Get(itemUUID):Replicate("Value")
+            setZeroWeightAndValue(UUID(item))
             --TODO Do something to trigger a refresh of the weight here
             --TODO probably add/remove an item to the bag
             return
@@ -310,15 +329,15 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 
     --Draggidy dropped onto the baggy, addy to the sell listy
-    if inventoryHolder == SELL_ADD_BAG_ITEM then Bags.AddToSellList(itemName, root) end
+    if inventoryHolder == SELL_ADD_BAG_ITEM then
+        Bags.AddToSellList(itemName, root)
+    end
 
-    --Specific to BAG SELL MODE ONLY
-    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then
-        if inventoryHolder == SELL_ADD_BAG_ITEM then
-            local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
-            HandleSelling(char, inventoryHolder, root, item)
-            return
-        end
+    -- Specific to BAG SELL MODE ONLY
+    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 and inventoryHolder == SELL_ADD_BAG_ITEM then
+        local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
+        HandleSelling(char, inventoryHolder, root, item)
+        return
     end
 
     -- Ignore the event firing for inventories other than the ones of our party
@@ -332,6 +351,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         if not success then
             translatedName = "NO HANDLE"
         end
+
         BasicDebug({
             "ITEM NAME : " .. (translatedName or "NO HANDLE"),
             "ROOT : " .. root,
@@ -340,12 +360,14 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
             "Root prefix : " .. rootName,
             string.format("['%s'] = '%s',", itemName, root)
         })
+
         if IsTransmogInvisible(itemName, item) then
             BasicDebug("Ignoring transmorb item")
             return
         end
+
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
-            local itemUUID = string.sub(item, -36)
+            local itemUUID = UUID(item)
             if Osi.IsContainer(itemUUID) == 1 then
                 Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
             end
@@ -375,7 +397,7 @@ end)
 
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
-        if damageAmount == 0 and string.sub(attackerOwner, -36) == Osi.GetHostCharacter() and string.sub(defender, -36) == SELL_ADD_BAG_ITEM then
+        if damageAmount == 0 and UUID(attackerOwner) == Osi.GetHostCharacter() and UUID(defender) == SELL_ADD_BAG_ITEM then
             if Config.config_tbl.MOD_ENABLED == 1 then
                 Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
             else
@@ -385,72 +407,72 @@ Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     end)
 
 Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
-    --Config Start
+    local function handleConfig(configMessage, configValue, nextMessage)
+        if message == configMessage then
+            Config.SetValue(Config.config_tbl, configValue, result)
+            Config.SaveConfig()
+            Osi.OpenMessageBoxYesNo(character, nextMessage)
+        end
+    end
+
+    -- Config Start
     if message == Messages.message_warning_config_start then
         if result == 1 then
             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
         else
             if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
         end
-        --Config Sell mode only
+
+        -- Config Sell mode only
     elseif message == Messages.message_bag_sell_mode then
-        Config.SetValue(Config.config_tbl, "BAG_SELL_MODE_ONLY", result)
-        Config.SaveConfig()
-        Osi.OpenMessageBoxYesNo(character, Messages.message_user_list_only)
-        --Config user list only
+        handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_user_list_only)
+
+        -- Config user list only
     elseif message == Messages.message_user_list_only then
-        Config.SetValue(Config.config_tbl, "CUSTOM_LISTS_ONLY", result)
-        Config.SaveConfig()
-        if PersistentVars.useSaveSpecificSellList == true then
-            Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list_already_exist)
-        else
-            Osi.OpenMessageBoxYesNo(character, Messages.message_save_specific_list)
-        end
-        --Config save specific list
+        handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY", PersistentVars.useSaveSpecificSellList
+            and Messages.message_save_specific_list_already_exist or Messages.message_save_specific_list)
+
+        -- Config save specific list
     elseif message == Messages.message_save_specific_list then
-        --Create id for this save
         if result == 1 and not PersistentVars.saveIdentifier then
             local random = Ext.Math.Random(0, 999999999)
             PersistentVars.saveIdentifier = random
             PersistentVars.useSaveSpecificSellList = true
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
             Config.LoadUserLists()
-            --Id already exists so we're just turning it on back
         elseif result == 1 and PersistentVars.saveIdentifier then
             PersistentVars.useSaveSpecificSellList = true
             Config.LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-        --Config save specific list already exist
+
+        -- Config save specific list already exist
     elseif message == Messages.message_save_specific_list_already_exist then
         if result == 1 then
             PersistentVars.useSaveSpecificSellList = false
             Config.LoadUserLists()
-        else
-            --do nothing
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-        --Config clear list
+
+        -- Config clear list
     elseif message == Messages.message_clear_sell_list then
         if result == 1 then
             Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
-        else
-            --do nothing
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
-        --disable mod
+
+        -- Disable mod
     elseif message == Messages.message_disable_mod then
-        local choice = 1
-        if result == 1 then choice = 0 else choice = 1 end
+        local choice = result == 1 and 0 or 1
         Config.SetValue(Config.config_tbl, "MOD_ENABLED", choice)
         Config.SaveConfig()
         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
-        --Re enable mod
+
+        -- Re-enable mod
     elseif message == Messages.message_enable_mod then
-        Config.SetValue(Config.config_tbl, "MOD_ENABLED", result)
-        Config.SaveConfig()
-        if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
+        handleConfig(Messages.message_enable_mod, "MOD_ENABLED", nil)
     end
+
     UpdateBagInfoScreenWithConfig()
 end)
 
