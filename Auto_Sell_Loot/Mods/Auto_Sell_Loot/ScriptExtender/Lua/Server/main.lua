@@ -13,11 +13,11 @@ SEll_LIST_EDIT_MODE = false
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
---TODO find out what this prefix is actually called
+--This shitty prefix is actually called... "name", yeah.
 function GetItemName(item)
     return string.sub(item, 1, -38)
 end
---TODO uncringe this
+--TODO uncringe this debug message
 function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
     BasicDebug("DeleteItem() - function called on Character : " ..
@@ -40,6 +40,7 @@ function IsTransmogInvisible(ItemName, Item)
 end
 
 --Resolve our translated string
+--TODO replace this cringe shit with Ext.Loca
 function ResolveMessagesHandles()
     local Messages = {
         message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
@@ -56,15 +57,23 @@ end
 
 --Update bag description with mod infos
 function UpdateBagInfoScreenWithConfig()
-    local handle="he671bb1egab4fg4f2bg981egdd0b1e8585af"
-    local content = string.format("Mod settings : \n - Bag Sell Mode Only : %s\n - User List Only : %s\n - Save Specific List : %s\n - Save Identifier : %s",
-    tostring(Config.config_tbl.BAG_SELL_MODE_ONLY == 1),
-    tostring(Config.config_tbl.CUSTOM_LISTS_ONLY == 1),
-    tostring(PersistentVars.useSaveSpecificSellList) or "not enabled",
-    tostring(PersistentVars.saveIdentifier) or "not enabled"
+    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or "not enabled"
+    local saveIdentifier = PersistentVars.saveIdentifier and PersistentVars.saveIdentifier or "not enabled"
+
+    local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
+    
+    local bagSellModeOnly = tostring(Config.config_tbl.BAG_SELL_MODE_ONLY == 1)
+    local userListOnly = tostring(Config.config_tbl.CUSTOM_LISTS_ONLY == 1)
+    
+    local content = string.format("Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s",
+        bagSellModeOnly, 
+        userListOnly, 
+        useSaveSpecificSellList,
+        saveIdentifier
     )
-    BasicDebug("UpdateBagInfoScreenWithConfig() - content : "..content,TEXT_COLORS.magenta)
-    UpdateTranslatedString(handle,content)
+
+    BasicDebug("UpdateBagInfoScreenWithConfig() - content: " .. content, TEXT_COLORS.magenta)
+    UpdateTranslatedString(handle, content)
 end
 
 
@@ -283,7 +292,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     inventoryHolder = string.sub(inventoryHolder, -36)
     if root == GOLD or root == SELL_ADD_BAG_ROOT then return end --Ignore gold & bag
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
-
+    --Sanity check
     Bags.FindBagItemFromTemplate()
     --Set weights & values of items inside bag to 0 in edit mode
     if SEll_LIST_EDIT_MODE == true then
@@ -324,7 +333,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
             translatedName = "NO HANDLE"
         end
         BasicDebug({
-            "ITEM NAME : " .. translatedName,
+            "ITEM NAME : " .. (translatedName or "NO HANDLE"),
             "ROOT : " .. root,
             "ITEM : " .. item,
             "Item prefix : " .. itemName,
