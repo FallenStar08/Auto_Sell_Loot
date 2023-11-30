@@ -2,19 +2,21 @@ JUNKTABLE = Ext.Require("Server/junk_table.lua")
 Ext.Require("Server/_ModInfos.lua")
 Ext.Require("Shared/_Globals.lua")
 Ext.Require("Shared/_Utils.lua")
-Ext.Require("Server/_Config.lua")
--- -------------------------------------------------------------------------- --
---                                   GLOBALS                                  --
--- -------------------------------------------------------------------------- --
+Ext.Require("Shared/_Config.lua")
+Ext.Require("Server/_Filters.lua")
+
+
 Bags = {}
-SELL_VALUE_COUNTER = 0
-FRACTIONAL_PART = 0
-SEll_LIST_EDIT_MODE = false
+local SELL_VALUE_COUNTER = 0
+local FRACTIONAL_PART = 0
+local SEll_LIST_EDIT_MODE = false
+
+
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
 --This shitty prefix is actually called... "name", yeah.
-function GetItemName(item)
+local function GetItemName(item)
     return string.sub(item, 1, -38)
 end
 
@@ -43,17 +45,17 @@ end
 --Resolve our translated string
 --TODO replace this cringe shit with Ext.Loca
 function ResolveMessagesHandles()
-    local Messages = {
-        message_warning_config_start = Osi.ResolveTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
-        message_bag_sell_mode = Osi.ResolveTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
-        message_user_list_only = Osi.ResolveTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
-        message_save_specific_list = Osi.ResolveTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
-        message_save_specific_list_already_exist = Osi.ResolveTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
-        message_clear_sell_list = Osi.ResolveTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
-        message_disable_mod = Osi.ResolveTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
-        message_enable_mod = Osi.ResolveTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8")
+    local messages = {
+        message_warning_config_start = GetTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
+        message_bag_sell_mode = GetTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
+        message_user_list_only = GetTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
+        message_save_specific_list = GetTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
+        message_save_specific_list_already_exist = GetTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
+        message_clear_sell_list = GetTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
+        message_disable_mod = GetTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
+        message_enable_mod = GetTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8")
     }
-    return Messages
+    return messages
 end
 
 --Update bag description with mod infos
@@ -64,8 +66,8 @@ function UpdateBagInfoScreenWithConfig()
 
     local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
 
-    local bagSellModeOnly = tostring(Config.config_tbl.BAG_SELL_MODE_ONLY == 1)
-    local userListOnly = tostring(Config.config_tbl.CUSTOM_LISTS_ONLY == 1)
+    local bagSellModeOnly = tostring(CONFIG.BAG_SELL_MODE_ONLY == 1)
+    local userListOnly = tostring(CONFIG.CUSTOM_LISTS_ONLY == 1)
 
     local content = string.format(
         "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s",
@@ -95,11 +97,11 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         -- Do this in a function, or don't
         BasicDebug("EVENT - EntityEvent with id : " .. id .. " finished")
         -- Get the removed items
-        local removedItems = Table.CompareSets(Config.selllist["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
+        local removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
         -- Because people will obvsiously complain they can't add items to the list by having the bag open
         -- Anticipating next complain being the fact that it doesn't pay them this way
         -- Fuck that, not doing it... yet? :')
-        local addedItems = Table.CompareSets(REMOVER_BAG_CONTENT_LIST, Config.selllist["SELLLIST"])
+        local addedItems = Table.CompareSets(REMOVER_BAG_CONTENT_LIST, SellList["SELLLIST"])
         BasicDebug("EVENT - EntityEvent Removed Items after bag closing :")
         BasicDebug(removedItems)
         BasicDebug("EVENT - EntityEvent Added Items after bag closing :")
@@ -108,8 +110,8 @@ Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
         for name, uid in pairs(removedItems) do JUNKTABLESET[name] = nil end
         for name, uid in pairs(addedItems) do JUNKTABLESET[name] = uid end
         -- Save to file
-        Config.selllist["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
-        JSON.LuaTableToFile(Config.selllist, Config.GetSellPath())
+        SellList["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
+        JSON.LuaTableToFile(SellList, GetSellPath())
         REMOVER_BAG_CONTENT_LIST = {}
         -- ------------------- Delete temporary items from the bag ------------------ --
         Osi.IterateInventory(SELL_ADD_BAG_ITEM, "AS_bagItems_OnItemDelete", "AS_bagItems_DeleteDone")
@@ -128,10 +130,10 @@ Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
     if not SELL_ADD_BAG_ITEM then Bags.FindBagItemFromTemplate() end
     if item == SELL_ADD_BAG_ITEM then
         SEll_LIST_EDIT_MODE = true
-        BasicDebug(Config.selllist["SELLLIST"])
+        BasicDebug(SellList["SELLLIST"])
         Osi.ShowNotification(character, "AUTOSELL - EDIT MODE ON")
         Ext.OnNextTick(function()
-            Bags.AddAllListItemToBag(Config.selllist["SELLLIST"], SELL_ADD_BAG_ITEM, character)
+            Bags.AddAllListItemToBag(SellList["SELLLIST"], SELL_ADD_BAG_ITEM, character)
         end)
     end
 end)
@@ -163,7 +165,7 @@ end
 -- Function to add a bag to a character if it isn't already in their inventory
 -- or in another party member's inventory (to avoid duplicate bags)
 function Bags.AddBag(bag, character, notification)
-    if Config.config_tbl["GIVE_BAG"] >= 1 then
+    if CONFIG.GIVE_BAG >= 1 then
         for _, player in pairs(SQUADIES) do if Osi.TemplateIsInInventory(bag, player) >= 1 then return end end
         BasicDebug("Bags.AddBag() Bag : " .. bag .. " adding to character : " .. character)
         Osi.TemplateAddTo(bag, character, 1, notification)
@@ -173,15 +175,15 @@ function Bags.AddBag(bag, character, notification)
 end
 
 function Bags.AddToSellList(item_name, root)
-    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 then return end
+    if CONFIG.BAG_SELL_MODE_ONLY == 1 then return end
     if StringEmpty(item_name) then
         BasicDebug("AddToSellList() - BAD ITEM with root : " .. root)
         return
     end
     JUNKTABLESET[item_name] = root
     -- Save the added item to file for next load
-    Config.selllist["SELLLIST"][item_name] = root
-    JSON.LuaTableToFile(Config.selllist, Config.GetSellPath())
+    SellList["SELLLIST"][item_name] = root
+    JSON.LuaTableToFile(SellList, GetSellPath())
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
 end
@@ -227,7 +229,7 @@ function HandleSelling(Owner, Character, Root, Item)
         itemValueCache[Item] = itemValue
     end
     itemValue = itemValue * exactItemAmount
-    local sellValue = itemValue * SELL_VALUE_PERCENTAGE / 100
+    local sellValue = itemValue * CONFIG.SELL_VALUE_PERCENTAGE / 100
     -- Accumulate the sell values
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
@@ -249,30 +251,6 @@ end
 --                            Core Logic Listeners                            --
 -- -------------------------------------------------------------------------- --
 
--- Loading is done Update SQUADIES and create the JUNKTABLESET from the base junk list and our sell & keep list
-Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, isEditorMode)
-    Messages = ResolveMessagesHandles()
-    if level == "SYS_CC_I" then return end
-    if not Config.initDone then Config.Init() end
-    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 1 then
-        SQUADIES = GetSquadies()
-        -- Add the bag(s) to the host char if none found in party inventory
-        Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
-        SELL_VALUE_PERCENTAGE = Config.GetValue(Config.config_tbl, "SELL_VALUE_PERCENTAGE")
-        BasicDebug("SELL_VALUE_PERCENTAGE : " .. SELL_VALUE_PERCENTAGE)
-        -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
-        BasicDebug(Config.keeplist)
-        BasicDebug(Config.selllist)
-        local keepList = Config.GetValue(Config.keeplist, "KEEPLIST")
-        local sellList = Config.GetValue(Config.selllist, "SELLLIST")
-        JUNKTABLESET = Table.ProcessTables(JUNKTABLE, keepList, sellList)
-        Bags.FindBagItemFromTemplate()
-        if Config.config_tbl.ENABLE_LOGGING == 1 then
-            Files.FlushLogBuffer()
-        end
-        UpdateBagInfoScreenWithConfig()
-    end
-end)
 
 -- Update SQUADIES for when a character joins the party
 Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(Character)
@@ -287,7 +265,7 @@ end)
 
 -- Includes moving from container to other inventories etc...
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
-    if not Config.initDone or Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 0 then
+    if not CONFIG or CONFIG.MOD_ENABLED == 0 then
         return -- Ignore if initialization not done or mod is disabled
     end
     local function setZeroWeightAndValue(itemUUID)
@@ -334,7 +312,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 
     -- Specific to BAG SELL MODE ONLY
-    if Config.config_tbl["BAG_SELL_MODE_ONLY"] == 1 and inventoryHolder == SELL_ADD_BAG_ITEM then
+    if CONFIG.BAG_SELL_MODE_ONLY == 1 and inventoryHolder == SELL_ADD_BAG_ITEM then
         local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
         HandleSelling(char, inventoryHolder, root, item)
         return
@@ -346,7 +324,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         --Error check this
         local success, translatedName = pcall(function()
             ---@diagnostic disable-next-line: param-type-mismatch
-            return Osi.ResolveTranslatedString(Osi.GetDisplayName(item))
+            return Ext.Loca.GetTranslatedString(Osi.GetDisplayName(item))
         end)
         if not success then
             translatedName = "NO HANDLE"
@@ -398,7 +376,7 @@ end)
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
         if damageAmount == 0 and GUID(attackerOwner) == Osi.GetHostCharacter() and GUID(defender) == SELL_ADD_BAG_ITEM then
-            if Config.config_tbl.MOD_ENABLED == 1 then
+            if CONFIG.MOD_ENABLED == 1 then
                 Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
             else
                 Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_enable_mod)
@@ -409,8 +387,8 @@ Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
 Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
     local function handleConfig(configMessage, configValue, nextMessage)
         if message == configMessage then
-            Config.SetValue(Config.config_tbl, configValue, result)
-            Config.SaveConfig()
+            CONFIG[configValue]=result
+            CONFIG:save()
             Osi.OpenMessageBoxYesNo(character, nextMessage)
         end
     end
@@ -438,11 +416,11 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
             local random = Ext.Math.Random(0, 999999999)
             PersistentVars.saveIdentifier = random
             PersistentVars.useSaveSpecificSellList = true
-            Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
-            Config.LoadUserLists()
+            InitDefaultFilterList(GetSellPath(), default_sell)
+            LoadUserLists()
         elseif result == 1 and PersistentVars.saveIdentifier then
             PersistentVars.useSaveSpecificSellList = true
-            Config.LoadUserLists()
+            LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
 
@@ -450,22 +428,21 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     elseif message == Messages.message_save_specific_list_already_exist then
         if result == 1 then
             PersistentVars.useSaveSpecificSellList = false
-            Config.LoadUserLists()
+            LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
 
         -- Config clear list
     elseif message == Messages.message_clear_sell_list then
         if result == 1 then
-            Config.InitDefaultFilterList(Config.GetSellPath(), Config.default_sell)
+            InitDefaultFilterList(GetSellPath(), default_sell)
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
 
         -- Disable mod
     elseif message == Messages.message_disable_mod then
         local choice = result == 1 and 0 or 1
-        Config.SetValue(Config.config_tbl, "MOD_ENABLED", choice)
-        Config.SaveConfig()
+        CONFIG["MOD_ENABLED"]=choice
         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
 
         -- Re-enable mod
@@ -478,28 +455,34 @@ end)
 
 
 -- -------------------------------------------------------------------------- --
---                                   TESTING                                  --
+--                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
-
-Ext.Events.ResetCompleted:Subscribe(function()
+local function start(level,isEditor)
+    if level == "SYS_CC_I" then return end
     Messages = ResolveMessagesHandles()
-    if not Config.initDone then Config.Init() end
-    if Config.GetValue(Config.config_tbl, "MOD_ENABLED") == 1 then
+    if not CONFIG then InitConfig() end
+    if CONFIG.MOD_ENABLED == 1 then
+        local execTime=MeasureExecutionTime(function()
+        InitFilters()
         SQUADIES = GetSquadies()
         -- Add the bag(s) to the host char if none found in party inventory
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
-        SELL_VALUE_PERCENTAGE = Config.GetValue(Config.config_tbl, "SELL_VALUE_PERCENTAGE")
-        BasicDebug("SELL_VALUE_PERCENTAGE : " .. SELL_VALUE_PERCENTAGE)
+        BasicDebug("SELL_VALUE_PERCENTAGE : " .. CONFIG.SELL_VALUE_PERCENTAGE)
         -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
-        BasicDebug(Config.keeplist)
-        BasicDebug(Config.selllist)
-        local keepList = Config.GetValue(Config.keeplist, "KEEPLIST")
-        local sellList = Config.GetValue(Config.selllist, "SELLLIST")
-        JUNKTABLESET = Table.ProcessTables(JUNKTABLE, keepList, sellList)
+        BasicDebug(KeepList)
+        BasicDebug(SellList)
+            JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
+        end)
+        
+        BasicDebug("Tables loaded and processed, set successfully created in "..execTime.." ms!")
         Bags.FindBagItemFromTemplate()
-        if Config.config_tbl.ENABLE_LOGGING == 1 then
+        if CONFIG.ENABLE_LOGGING == 1 then
             Files.FlushLogBuffer()
         end
         UpdateBagInfoScreenWithConfig()
     end
-end)
+end
+
+Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", start)
+
+Ext.Events.ResetCompleted:Subscribe(start)
