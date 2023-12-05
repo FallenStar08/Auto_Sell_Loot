@@ -372,7 +372,6 @@ end)
 -- OpenMessageBoxChoice (character, message, choice1, choice2)	
 -- OpenMessageBoxYesNo (character, message)
 
-
 Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
     function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
         if damageAmount == 0 and GUID(attackerOwner) == Osi.GetHostCharacter() and GUID(defender) == SELL_ADD_BAG_ITEM then
@@ -388,8 +387,10 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     local function handleConfig(configMessage, configValue, nextMessage)
         if message == configMessage then
             CONFIG[configValue]=result
-            CONFIG:save()
-            Osi.OpenMessageBoxYesNo(character, nextMessage)
+            --CONFIG:save()
+            if nextMessage then
+                Osi.OpenMessageBoxYesNo(character, nextMessage)
+            end
         end
     end
 
@@ -460,7 +461,7 @@ end)
 local function start(level,isEditor)
     if level == "SYS_CC_I" then return end
     Messages = ResolveMessagesHandles()
-    if not CONFIG then InitConfig() end
+    if not CONFIG then CONFIG=InitConfig() end
     if CONFIG.MOD_ENABLED == 1 then
         local execTime=MeasureExecutionTime(function()
         InitFilters()
