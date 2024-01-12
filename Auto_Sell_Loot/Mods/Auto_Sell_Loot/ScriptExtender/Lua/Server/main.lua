@@ -15,16 +15,44 @@ local SEll_LIST_EDIT_MODE = false
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
 -- -------------------------------------------------------------------------- --
---This shitty prefix is actually called... "name", yeah.
+
+--This is what's called "Name" in the item template, idk which way to get it is smarter
+--Probably neither
 local function GetItemName(item)
     return string.sub(item, 1, -38)
 end
 
---TODO uncringe this debug message
-function DeleteItem(Character, Item, Amount)
+local function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
-    BasicDebug("DeleteItem() - function called on Character : " ..
-        Character .. " for : " .. Amount .. "units of item with UUID : " .. Item)
+end
+
+--TODO
+--Create pouch
+--Move Dummy inventory to pouch
+--Zap back pouch inventory to dummy
+--Nuke pouch
+--Profit
+local function MoveItemToHiddeyHole(Character, Item, Amount)
+    --for now...
+    Osi.RequestDelete(Item)
+    --Osi.ToInventory(Item,NAKED_DUMMY_2)
+end
+
+function Bags.MoveNakedManItemsToBag(bag)
+    Osi.MoveAllItemsTo(NAKED_DUMMY_2, bag)
+end
+
+function BringHideyHoleToMe()
+    local x, y, z = Osi.GetPosition(NAKED_DUMMY_2)
+    Osi.TeleportTo(NAKED_DUMMY_2, Osi.GetHostCharacter())
+    Ext.OnNextTick(function() Osi.SetOnStage(NAKED_DUMMY_2, 1) end)
+    Osi.SetImmortal(NAKED_DUMMY_2, 1)
+    local dummy = Ext.Entity.Get(NAKED_DUMMY_2)
+    dummy.CanEnterChasm.CanEnter = false
+    dummy.CanBeLooted.Flags = 1
+    dummy:Replicate("CanBeLooted")
+    dummy:Replicate("CanEnterChasm")
+    --Ext.OnNextTick(function() Osi.ActivateTrade(Osi.GetHostCharacter(),NAKED_DUMMY_2,1) end)
 end
 
 --Anti morbing measure, this ain't morbing time
@@ -238,12 +266,14 @@ function HandleSelling(Owner, Character, Root, Item)
         goldToAdd = goldToAdd + Custom_floor(FRACTIONAL_PART) -- Fractional part
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
-        DeleteItem(Character, Item, exactItemAmount)
+        --DeleteItem(Character, Item, exactItemAmount)
+        MoveItemToHiddeyHole(Character, Item, exactItemAmount)
         SELL_VALUE_COUNTER = 0
         FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
         BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
     else
-        DeleteItem(Character, Item, exactItemAmount)
+        --DeleteItem(Character, Item, exactItemAmount)
+        MoveItemToHiddeyHole(Character, Item, exactItemAmount)
     end
 end
 
@@ -271,8 +301,8 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     local function setZeroWeightAndValue(itemUUID)
         local entity = Ext.Entity.Get(itemUUID)
         if entity then
-            local dataComp = entity:GetComponent("Data")
-            local valueComp = entity:GetComponent("Value")
+            local dataComp = entity.Data
+            local valueComp = entity.Value
             if dataComp and valueComp then
                 dataComp.Weight = 0
                 valueComp.Value = 0
@@ -386,7 +416,7 @@ Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
 Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
     local function handleConfig(configMessage, configValue, nextMessage)
         if message == configMessage then
-            CONFIG[configValue]=result
+            CONFIG[configValue] = result
             --CONFIG:save()
             if nextMessage then
                 Osi.OpenMessageBoxYesNo(character, nextMessage)
@@ -443,7 +473,7 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         -- Disable mod
     elseif message == Messages.message_disable_mod then
         local choice = result == 1 and 0 or 1
-        CONFIG["MOD_ENABLED"]=choice
+        CONFIG["MOD_ENABLED"] = choice
         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
 
         -- Re-enable mod
@@ -458,12 +488,11 @@ end)
 -- -------------------------------------------------------------------------- --
 --                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
-local function start(level,isEditor)
+local function start(level, isEditor)
     if level == "SYS_CC_I" then return end
     Messages = ResolveMessagesHandles()
-    if not CONFIG then CONFIG=InitConfig() end
-    if CONFIG.MOD_ENABLED == 1 then
-        local execTime=MeasureExecutionTime(function()
+    if not CONFIG then CONFIG = InitConfig() end
+    local execTime = MeasureExecutionTime(function()
         InitFilters()
         SQUADIES = GetSquadies()
         -- Add the bag(s) to the host char if none found in party inventory
@@ -472,16 +501,15 @@ local function start(level,isEditor)
         -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
         BasicDebug(KeepList)
         BasicDebug(SellList)
-            JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
-        end)
-        
-        BasicDebug("Tables loaded and processed, set successfully created in "..execTime.." ms!")
-        Bags.FindBagItemFromTemplate()
-        if CONFIG.ENABLE_LOGGING == 1 then
-            Files.FlushLogBuffer()
-        end
-        UpdateBagInfoScreenWithConfig()
+        JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
+    end)
+
+    BasicDebug("Tables loaded and processed, set successfully created in " .. execTime .. " ms!")
+    Bags.FindBagItemFromTemplate()
+    if CONFIG.ENABLE_LOGGING == 1 then
+        Files.FlushLogBuffer()
     end
+    UpdateBagInfoScreenWithConfig()
 end
 
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", start)
