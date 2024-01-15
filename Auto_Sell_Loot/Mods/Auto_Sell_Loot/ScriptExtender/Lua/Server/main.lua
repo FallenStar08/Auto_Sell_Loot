@@ -81,7 +81,8 @@ function ResolveMessagesHandles()
         message_save_specific_list_already_exist = GetTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
         message_clear_sell_list = GetTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
         message_disable_mod = GetTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
-        message_enable_mod = GetTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8")
+        message_enable_mod = GetTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8"),
+        message_delete_bag = GetTranslatedString("h4a84239ag4dd0g4311gbd5ege1aac8b9cca2")
     }
     return messages
 end
@@ -96,13 +97,16 @@ function UpdateBagInfoScreenWithConfig()
 
     local bagSellModeOnly = tostring(CONFIG.BAG_SELL_MODE_ONLY == 1)
     local userListOnly = tostring(CONFIG.CUSTOM_LISTS_ONLY == 1)
+    local modEnabled = tostring(CONFIG.MOD_ENABLED == 1)
 
     local content = string.format(
-        "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s",
+        "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s \n - Mod Enabled : %s",
         bagSellModeOnly,
         userListOnly,
         useSaveSpecificSellList,
-        saveIdentifier
+        saveIdentifier,
+        modEnabled
+
     )
 
     BasicDebug("UpdateBagInfoScreenWithConfig() - content: " .. content, TEXT_COLORS.magenta)
@@ -402,13 +406,13 @@ end)
 -- OpenMessageBoxChoice (character, message, choice1, choice2)	
 -- OpenMessageBoxYesNo (character, message)
 
-Ext.Osiris.RegisterListener("AttackedBy", 7, "after",
-    function(defender, attackerOwner, attacker2, damageType, damageAmount, damageCause, storyActionID)
-        if damageAmount == 0 and GUID(attackerOwner) == Osi.GetHostCharacter() and GUID(defender) == SELL_ADD_BAG_ITEM then
+Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
+    function(caster, target, spell, spellType, spellElement, storyActionID)
+        if GUID(caster) == Osi.GetHostCharacter() and GUID(target) == SELL_ADD_BAG_ITEM then
             if CONFIG.MOD_ENABLED == 1 then
-                Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_warning_config_start)
+                Osi.OpenMessageBoxYesNo(caster, Messages.message_warning_config_start)
             else
-                Osi.OpenMessageBoxYesNo(attackerOwner, Messages.message_enable_mod)
+                Osi.OpenMessageBoxYesNo(caster, Messages.message_enable_mod)
             end
         end
     end)
@@ -468,7 +472,16 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         if result == 1 then
             InitDefaultFilterList(GetSellPath(), default_sell)
         end
-        Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
+        Osi.OpenMessageBoxYesNo(character, Messages.message_delete_bag)
+        --Delete Bag
+    elseif message == Messages.message_delete_bag then
+        if result == 1 then
+            Osi.RequestDelete(SELL_ADD_BAG_ITEM)
+            local choice = result == 1 and 0 or 1
+            CONFIG["MOD_ENABLED"] = choice
+        else
+            Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
+        end
 
         -- Disable mod
     elseif message == Messages.message_disable_mod then
