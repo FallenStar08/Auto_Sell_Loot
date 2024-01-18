@@ -1,6 +1,4 @@
-
-local default_config_tbl = {
-    VERSION = CurrentVersion,
+local default_config={
     SELL_VALUE_PERCENTAGE = 40,
     LOG_ENABLED = 0,
     MOD_ENABLED = 1,
@@ -11,4 +9,4 @@ local default_config_tbl = {
     BAG_SELL_MODE_ONLY = 0,
 }
 
-return default_config_tbl
+MOD_INFO=ModInfo:new("Fall_AutoSeller","Fall_AutoSeller",true,default_config)

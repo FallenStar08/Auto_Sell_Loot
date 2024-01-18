@@ -1,8 +1,5 @@
 JUNKTABLE = Ext.Require("Server/junk_table.lua")
-Ext.Require("Server/_ModInfos.lua")
-Ext.Require("Shared/_Globals.lua")
-Ext.Require("Shared/_Utils.lua")
-Ext.Require("Shared/_Config.lua")
+
 Ext.Require("Server/_Filters.lua")
 
 
@@ -265,15 +262,15 @@ function HandleSelling(Owner, Character, Root, Item)
     -- Accumulate the sell values
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
-        local goldToAdd = Custom_floor(SELL_VALUE_COUNTER)    --Integer part
+        local goldToAdd = math.floor(SELL_VALUE_COUNTER)    --Integer part
         FRACTIONAL_PART = FRACTIONAL_PART + (SELL_VALUE_COUNTER - goldToAdd)
-        goldToAdd = goldToAdd + Custom_floor(FRACTIONAL_PART) -- Fractional part
+        goldToAdd = goldToAdd + math.floor(FRACTIONAL_PART) -- Fractional part
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
         --DeleteItem(Character, Item, exactItemAmount)
         MoveItemToHiddeyHole(Character, Item, exactItemAmount)
         SELL_VALUE_COUNTER = 0
-        FRACTIONAL_PART = FRACTIONAL_PART - Custom_floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
+        FRACTIONAL_PART = FRACTIONAL_PART - math.floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
         BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
     else
         --DeleteItem(Character, Item, exactItemAmount)
@@ -504,7 +501,7 @@ end)
 local function start(level, isEditor)
     if level == "SYS_CC_I" then return end
     Messages = ResolveMessagesHandles()
-    if not CONFIG then CONFIG = InitConfig() end
+    if not CONFIG then CONFIG=InitConfig() end
     local execTime = MeasureExecutionTime(function()
         InitFilters()
         SQUADIES = GetSquadies()
