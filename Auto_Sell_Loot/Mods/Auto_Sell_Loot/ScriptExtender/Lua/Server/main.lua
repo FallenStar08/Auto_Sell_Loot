@@ -67,8 +67,6 @@ function IsTransmogInvisible(ItemName, Item)
     return false
 end
 
---Resolve our translated string
---TODO replace this cringe shit with Ext.Loca
 function ResolveMessagesHandles()
     local messages = {
         message_warning_config_start = GetTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
@@ -405,7 +403,7 @@ end)
 
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
     function(caster, target, spell, spellType, spellElement, storyActionID)
-        if GUID(caster) == Osi.GetHostCharacter() and GUID(target) == SELL_ADD_BAG_ITEM then
+        if GUID(caster) == GUID(Osi.GetHostCharacter()) and GUID(target) == SELL_ADD_BAG_ITEM then
             if CONFIG.MOD_ENABLED == 1 then
                 Osi.OpenMessageBoxYesNo(caster, Messages.message_warning_config_start)
             else
