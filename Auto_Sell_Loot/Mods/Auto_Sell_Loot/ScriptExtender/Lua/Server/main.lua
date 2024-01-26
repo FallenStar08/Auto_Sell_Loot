@@ -84,29 +84,43 @@ end
 
 --Update bag description with mod infos
 function UpdateBagInfoScreenWithConfig()
-    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or
-        "not enabled"
+    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or "not enabled"
     local saveIdentifier = PersistentVars.saveIdentifier and PersistentVars.saveIdentifier or "not enabled"
 
     local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
 
-    local bagSellModeOnly = tostring(CONFIG.BAG_SELL_MODE_ONLY == 1)
-    local userListOnly = tostring(CONFIG.CUSTOM_LISTS_ONLY == 1)
-    local modEnabled = tostring(CONFIG.MOD_ENABLED == 1)
+    -- Determine the color of each setting based on its value
+    local bagSellModeColor = CONFIG.BAG_SELL_MODE_ONLY == 1 and "green" or "red"
+    local userListColor = CONFIG.CUSTOM_LISTS_ONLY == 1 and "green" or "red"
+    local useSaveSpecificSellListColor = PersistentVars.useSaveSpecificSellList and "green" or "red"
+    local saveIdentifierColor = PersistentVars.saveIdentifier and "green" or "red"
+    local modEnabledColor = CONFIG.MOD_ENABLED == 1 and "green" or "red"
+
+    -- Convert RGB colors to hexadecimal
+    local greenHex = RgbToHex(0, 255, 0)
+    local redHex = RgbToHex(255, 0, 0)
+    local orangeHex = RgbToHex(255, 165, 0)
+
+    -- Format the strings with appropriate color tags
+    local bagSellModeText = string.format("<font color='%s'>%s</font>", bagSellModeColor == "green" and greenHex or redHex, tostring(CONFIG.BAG_SELL_MODE_ONLY == 1))
+    local userListText = string.format("<font color='%s'>%s</font>", userListColor == "green" and greenHex or redHex, tostring(CONFIG.CUSTOM_LISTS_ONLY == 1))
+    local useSaveSpecificSellListText = string.format("<font color='%s'>%s</font>", useSaveSpecificSellListColor == "green" and greenHex or orangeHex, useSaveSpecificSellList)
+    local saveIdentifierText =  string.format("<font color='%s'>%s</font>", saveIdentifierColor == "green" and greenHex or orangeHex, saveIdentifier)
+    local modEnabledText = string.format("<font color='%s'>%s</font>", modEnabledColor == "green" and greenHex or redHex, tostring(CONFIG.MOD_ENABLED == 1))
 
     local content = string.format(
         "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s \n - Mod Enabled : %s",
-        bagSellModeOnly,
-        userListOnly,
-        useSaveSpecificSellList,
-        saveIdentifier,
-        modEnabled
-
+        bagSellModeText,
+        userListText,
+        useSaveSpecificSellListText,
+        saveIdentifierText,
+        modEnabledText
     )
 
     BasicDebug("UpdateBagInfoScreenWithConfig() - content: " .. content, TEXT_COLORS.magenta)
     UpdateTranslatedString(handle, content)
 end
+
 
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
@@ -387,6 +401,18 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 end)
 
+-- -------------------------------------------------------------------------- --
+--                          KEEP LIST FOR OTHER MODS                          --
+-- -------------------------------------------------------------------------- --
+
+local function addItemsUsedInModsToKeepListIfLoaded()
+    --Siael equip mod uses gold bars
+    if Ext.Mod.IsModLoaded("73696165-6c32-4e31-914f-fc839aaef51d") then
+        KeepList.KEEPLIST["LOOT_GEN_Metalbar_Gold_A"] = "44f47718-9769-4c0e-af75-7789d2f2913d"
+    end
+end
+
+
 
 -- -------------------------------------------------------------------------- --
 --                                   Config                                   --
@@ -419,6 +445,8 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
             --CONFIG:save()
             if nextMessage then
                 Osi.OpenMessageBoxYesNo(character, nextMessage)
+            else
+                if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
             end
         end
     end
@@ -509,6 +537,7 @@ local function start(level, isEditor)
         -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
         BasicDebug(KeepList)
         BasicDebug(SellList)
+        addItemsUsedInModsToKeepListIfLoaded()
         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
     end)
 
