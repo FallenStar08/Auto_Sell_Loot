@@ -125,45 +125,7 @@ end
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
--- Listener for bag iteration, may just be our generic EntityEvent listener if needed for more later
-Ext.Osiris.RegisterListener("EntityEvent", 2, "after", function(guid, id)
-    -- -------------------------- Bags.AddContentToList ------------------------- --
-    if id == "AS_bagItems_OnItem" then
-        local itemName = GetItemName(guid)
-        if not StringEmpty(itemName) then
-            local template = Osi.GetTemplate(guid)
-            REMOVER_BAG_CONTENT_LIST[itemName] = GUID(template)
-        end
-    elseif id == "AS_bagItems_Done" then
-        -- Do this in a function, or don't
-        BasicDebug("EVENT - EntityEvent with id : " .. id .. " finished")
-        -- Get the removed items
-        local removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
-        -- Because people will obvsiously complain they can't add items to the list by having the bag open
-        -- Anticipating next complain being the fact that it doesn't pay them this way
-        -- Fuck that, not doing it... yet? :')
-        local addedItems = Table.CompareSets(REMOVER_BAG_CONTENT_LIST, SellList["SELLLIST"])
-        BasicDebug("EVENT - EntityEvent Removed Items after bag closing :")
-        BasicDebug(removedItems)
-        BasicDebug("EVENT - EntityEvent Added Items after bag closing :")
-        BasicDebug(addedItems)
-        -- Disable/Enable them in the current session
-        for name, uid in pairs(removedItems) do JUNKTABLESET[name] = nil end
-        for name, uid in pairs(addedItems) do JUNKTABLESET[name] = uid end
-        -- Save to file
-        SellList["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
-        JSON.LuaTableToFile(SellList, GetSellPath())
-        REMOVER_BAG_CONTENT_LIST = {}
-        -- ------------------- Delete temporary items from the bag ------------------ --
-        Osi.IterateInventory(SELL_ADD_BAG_ITEM, "AS_bagItems_OnItemDelete", "AS_bagItems_DeleteDone")
-    end
-    if id == "AS_bagItems_OnItemDelete" then
-        -- ------------------- Delete temporary items from the bag ------------------ --
-        DeleteItem("", guid, "some")
-        --local exactItemAmount, totalAmount = Osi.GetStackAmount(guid)
-        --Osi.TemplateRemoveFrom(string.sub(Osi.GetTemplate(guid), -36), SELL_ADD_BAG_ITEM, exactItemAmount)
-    end
-end)
+
 
 -- Listen for item uses, in this case the opening of our bag counts as it being used
 Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
@@ -181,8 +143,7 @@ end)
 
 -- Listener for item uses stop, in this case the closing of our bag counts as it not being used anymore
 Ext.Osiris.RegisterListener("UseFinished", 3, "after", function(character, item, sucess)
-    item = GUID(item)
-    if SEll_LIST_EDIT_MODE == true and item == SELL_ADD_BAG_ITEM then
+    if SEll_LIST_EDIT_MODE == true and GUID(item) == SELL_ADD_BAG_ITEM then
         Osi.ShowNotification(character, "AUTOSELL - EDIT MODE OFF")
         Bags.AddContentToList(SELL_ADD_BAG_ITEM, character)
         SEll_LIST_EDIT_MODE = false
@@ -199,8 +160,30 @@ function Bags.AddAllListItemToBag(list, bagItem, character)
 end
 
 function Bags.AddContentToList(bagItem, character)
-    REMOVER_BAG_CONTENT_LIST = {}
-    Osi.IterateInventory(bagItem, "AS_bagItems_OnItem", "AS_bagItems_Done")
+    local REMOVER_BAG_CONTENT_LIST = {}
+    local bagInv=DeepIterateInventory(_GE(bagItem))
+    _D(bagInv)
+    for uuid,data in pairs(bagInv) do
+        local templateGuid=data.template
+        local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or "0"
+        REMOVER_BAG_CONTENT_LIST[template.Name] = GUID(templateGuid)
+        Osi.RequestDelete(uuid)
+    end
+    local removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
+    -- Because people will obvsiously complain they can't add items to the list by having the bag open
+    -- Anticipating next complain being the fact that it doesn't pay them this way
+    -- Fuck that, not doing it... yet? :')
+    local addedItems = Table.CompareSets(REMOVER_BAG_CONTENT_LIST, SellList["SELLLIST"])
+    BasicDebug("AddContentToList() Removed Items after bag closing :")
+    BasicDebug(removedItems)
+    BasicDebug("AddContentToList() Added Items after bag closing :")
+    BasicDebug(addedItems)
+    -- Disable/Enable them in the current session
+    for name, uid in pairs(removedItems) do JUNKTABLESET[name] = nil end
+    for name, uid in pairs(addedItems) do JUNKTABLESET[name] = uid end
+    -- Save to file
+    SellList["SELLLIST"] = REMOVER_BAG_CONTENT_LIST
+    JSON.LuaTableToFile(SellList, GetSellPath())
 end
 
 -- Function to add a bag to a character if it isn't already in their inventory
