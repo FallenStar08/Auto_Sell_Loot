@@ -162,7 +162,6 @@ end
 function Bags.AddContentToList(bagItem, character)
     local REMOVER_BAG_CONTENT_LIST = {}
     local bagInv=DeepIterateInventory(_GE(bagItem))
-    _D(bagInv)
     for uuid,data in pairs(bagInv) do
         local templateGuid=data.template
         local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or "0"
@@ -288,25 +287,26 @@ Ext.Osiris.RegisterListener("CharacterLeftParty", 1, "after", function(Character
     SQUADIES = GetSquadies()
 end)
 
+local function setZeroWeightAndValue(itemUUID)
+    local entity = Ext.Entity.Get(itemUUID)
+    if entity then
+        local dataComp = entity.Data
+        local valueComp = entity.Value
+        if dataComp and valueComp then
+            dataComp.Weight = 0
+            valueComp.Value = 0
+            entity:Replicate("Data")
+            entity:Replicate("Value")
+        end
+    end
+end
 
 -- Includes moving from container to other inventories etc...
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
     if not CONFIG or CONFIG.MOD_ENABLED == 0 then
         return -- Ignore if initialization not done or mod is disabled
     end
-    local function setZeroWeightAndValue(itemUUID)
-        local entity = Ext.Entity.Get(itemUUID)
-        if entity then
-            local dataComp = entity.Data
-            local valueComp = entity.Value
-            if dataComp and valueComp then
-                dataComp.Weight = 0
-                valueComp.Value = 0
-                entity:Replicate("Data")
-                entity:Replicate("Value")
-            end
-        end
-    end
+
 
     local rootName = GetItemName(root)
     root = GUID(root)
@@ -325,8 +325,6 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     if SEll_LIST_EDIT_MODE == true then
         if inventoryHolder == SELL_ADD_BAG_ITEM then
             setZeroWeightAndValue(GUID(item))
-            --TODO Do something to trigger a refresh of the weight here
-            --TODO probably add/remove an item to the bag
             return
         end
         return
