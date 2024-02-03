@@ -475,6 +475,8 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     elseif message == Messages.message_clear_sell_list then
         if result == 1 then
             InitDefaultFilterList(GetSellPath(), default_sell)
+            SellList.SELLLIST={}
+            JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_delete_bag)
         --Delete Bag
