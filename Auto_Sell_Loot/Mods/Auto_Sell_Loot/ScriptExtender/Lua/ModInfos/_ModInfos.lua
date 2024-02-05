@@ -7,6 +7,7 @@ local default_config={
     GIVE_BAG = 1,
     CUSTOM_LISTS_ONLY = 0,
     BAG_SELL_MODE_ONLY = 0,
+    MARK_AS_WARE = 0,
 }
 
 MOD_INFO=ModInfo:new("Fall_AutoSeller","Fall_AutoSeller",true,default_config)

@@ -77,7 +77,8 @@ function ResolveMessagesHandles()
         message_clear_sell_list = GetTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
         message_disable_mod = GetTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
         message_enable_mod = GetTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8"),
-        message_delete_bag = GetTranslatedString("h4a84239ag4dd0g4311gbd5ege1aac8b9cca2")
+        message_delete_bag = GetTranslatedString("h4a84239ag4dd0g4311gbd5ege1aac8b9cca2"),
+        message_mark_as_ware = GetTranslatedString("hd3cb471fg0b62g429eg97efg9f3a0f99cc7d")
     }
     return messages
 end
@@ -92,6 +93,7 @@ function UpdateBagInfoScreenWithConfig()
     -- Determine the color of each setting based on its value
     local bagSellModeColor = CONFIG.BAG_SELL_MODE_ONLY == 1 and "green" or "red"
     local userListColor = CONFIG.CUSTOM_LISTS_ONLY == 1 and "green" or "red"
+    local markAsWareColor = CONFIG.MARK_AS_WARE == 1 and "green" or "red"
     local useSaveSpecificSellListColor = PersistentVars.useSaveSpecificSellList and "green" or "red"
     local saveIdentifierColor = PersistentVars.saveIdentifier and "green" or "red"
     local modEnabledColor = CONFIG.MOD_ENABLED == 1 and "green" or "red"
@@ -104,14 +106,16 @@ function UpdateBagInfoScreenWithConfig()
     -- Format the strings with appropriate color tags
     local bagSellModeText = string.format("<font color='%s'>%s</font>", bagSellModeColor == "green" and greenHex or redHex, tostring(CONFIG.BAG_SELL_MODE_ONLY == 1))
     local userListText = string.format("<font color='%s'>%s</font>", userListColor == "green" and greenHex or redHex, tostring(CONFIG.CUSTOM_LISTS_ONLY == 1))
+    local markAsWareText = string.format("<font color='%s'>%s</font>", markAsWareColor == "green" and greenHex or redHex, tostring(CONFIG.MARK_AS_WARE == 1))
     local useSaveSpecificSellListText = string.format("<font color='%s'>%s</font>", useSaveSpecificSellListColor == "green" and greenHex or orangeHex, useSaveSpecificSellList)
     local saveIdentifierText =  string.format("<font color='%s'>%s</font>", saveIdentifierColor == "green" and greenHex or orangeHex, saveIdentifier)
     local modEnabledText = string.format("<font color='%s'>%s</font>", modEnabledColor == "green" and greenHex or redHex, tostring(CONFIG.MOD_ENABLED == 1))
 
     local content = string.format(
-        "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Save Specific List: %s\n - Save Identifier: %s \n - Mod Enabled : %s",
+        "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Mark as ware mode: %s\n - Save Specific List: %s\n - Save Identifier: %s \n - Mod Enabled : %s",
         bagSellModeText,
         userListText,
+        markAsWareText,
         useSaveSpecificSellListText,
         saveIdentifierText,
         modEnabledText
@@ -197,7 +201,7 @@ function Bags.AddBag(bag, character, notification)
     end
 end
 
-function Bags.AddToSellList(item_name, root)
+function Bags.AddToSellList(item_name, root, item, bagOwner)
     if CONFIG.BAG_SELL_MODE_ONLY == 1 then return end
     if StringEmpty(item_name) then
         BasicDebug("AddToSellList() - BAD ITEM with root : " .. root)
@@ -209,6 +213,9 @@ function Bags.AddToSellList(item_name, root)
     JSON.LuaTableToFile(SellList, GetSellPath())
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
+    if CONFIG.MARK_AS_WARE == 1 then
+        DelayedCall(500, function() Osi.ToInventory(item, bagOwner,99999999) end)
+    end
 end
 
 function Bags.FindBagItemFromTemplate()
@@ -307,7 +314,6 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         return -- Ignore if initialization not done or mod is disabled
     end
 
-
     local rootName = GetItemName(root)
     root = GUID(root)
     inventoryHolder = GUID(inventoryHolder)
@@ -332,7 +338,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
 
     --Draggidy dropped onto the baggy, addy to the sell listy
     if inventoryHolder == SELL_ADD_BAG_ITEM then
-        Bags.AddToSellList(itemName, root)
+        Bags.AddToSellList(itemName, root, item, Osi.GetOwner(inventoryHolder))
     end
 
     -- Specific to BAG SELL MODE ONLY
@@ -369,12 +375,16 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
         end
 
         if Table.FindKeyInSet(JUNKTABLESET, itemName) then
-            local itemUUID = GUID(item)
-            if Osi.IsContainer(itemUUID) == 1 then
-                Osi.MoveAllItemsTo(itemUUID, inventoryHolder)
+            if Osi.IsContainer(item) == 1 then
+                Osi.MoveAllItemsTo(item, inventoryHolder)
             end
-            HandleSelling(inventoryHolder, inventoryHolder, root, item)
-            return
+            if CONFIG.MARK_AS_WARE==1 then
+                MarkAsWare(item)
+                return
+            else
+                HandleSelling(inventoryHolder, inventoryHolder, root, item)
+                return
+            end
         else
             -- Ignored item
             return
@@ -442,7 +452,10 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
 
         -- Config Sell mode only
     elseif message == Messages.message_bag_sell_mode then
-        handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_user_list_only)
+        handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_mark_as_ware)
+
+    elseif message == Messages.message_mark_as_ware then
+        handleConfig(Messages.message_mark_as_ware, "MARK_AS_WARE", Messages.message_user_list_only)
 
         -- Config user list only
     elseif message == Messages.message_user_list_only then
