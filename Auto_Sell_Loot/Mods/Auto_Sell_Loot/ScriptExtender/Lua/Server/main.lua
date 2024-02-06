@@ -23,7 +23,7 @@ local function DeleteItem(Character, Item, Amount)
     Osi.RequestDelete(Item)
 end
 
---TODO
+--TODO FIND SOMEWHERE SAFE TO HIDE ITEMS
 --Create pouch
 --Move Dummy inventory to pouch
 --Zap back pouch inventory to dummy
@@ -35,22 +35,22 @@ local function MoveItemToHiddeyHole(Character, Item, Amount)
     --Osi.ToInventory(Item,NAKED_DUMMY_2)
 end
 
-function Bags.MoveNakedManItemsToBag(bag)
-    Osi.MoveAllItemsTo(NAKED_DUMMY_2, bag)
-end
+-- function Bags.MoveNakedManItemsToBag(bag)
+--     Osi.MoveAllItemsTo(NAKED_DUMMY_2, bag)
+-- end
 
-function BringHideyHoleToMe()
-    local x, y, z = Osi.GetPosition(NAKED_DUMMY_2)
-    Osi.TeleportTo(NAKED_DUMMY_2, Osi.GetHostCharacter())
-    Ext.OnNextTick(function() Osi.SetOnStage(NAKED_DUMMY_2, 1) end)
-    Osi.SetImmortal(NAKED_DUMMY_2, 1)
-    local dummy = Ext.Entity.Get(NAKED_DUMMY_2)
-    dummy.CanEnterChasm.CanEnter = false
-    dummy.CanBeLooted.Flags = 1
-    dummy:Replicate("CanBeLooted")
-    dummy:Replicate("CanEnterChasm")
-    --Ext.OnNextTick(function() Osi.ActivateTrade(Osi.GetHostCharacter(),NAKED_DUMMY_2,1) end)
-end
+-- function BringHideyHoleToMe()
+--     local x, y, z = Osi.GetPosition(NAKED_DUMMY_2)
+--     Osi.TeleportTo(NAKED_DUMMY_2, Osi.GetHostCharacter())
+--     Ext.OnNextTick(function() Osi.SetOnStage(NAKED_DUMMY_2, 1) end)
+--     Osi.SetImmortal(NAKED_DUMMY_2, 1)
+--     local dummy = Ext.Entity.Get(NAKED_DUMMY_2)
+--     dummy.CanEnterChasm.CanEnter = false
+--     dummy.CanBeLooted.Flags = 1
+--     dummy:Replicate("CanBeLooted")
+--     dummy:Replicate("CanEnterChasm")
+--     --Ext.OnNextTick(function() Osi.ActivateTrade(Osi.GetHostCharacter(),NAKED_DUMMY_2,1) end)
+-- end
 
 --Anti morbing measure, this ain't morbing time
 function IsTransmogInvisible(ItemName, Item)
@@ -67,7 +67,7 @@ function IsTransmogInvisible(ItemName, Item)
     return false
 end
 
-function ResolveMessagesHandles()
+local function ResolveMessagesHandles()
     local messages = {
         message_warning_config_start = GetTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
         message_bag_sell_mode = GetTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
@@ -84,7 +84,7 @@ function ResolveMessagesHandles()
 end
 
 --Update bag description with mod infos
-function UpdateBagInfoScreenWithConfig()
+local function UpdateBagInfoScreenWithConfig()
     local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or "not enabled"
     local saveIdentifier = PersistentVars.saveIdentifier and PersistentVars.saveIdentifier or "not enabled"
 
@@ -130,29 +130,6 @@ end
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
 
-
--- Listen for item uses, in this case the opening of our bag counts as it being used
-Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
-    item = GUID(item)
-    if not SELL_ADD_BAG_ITEM then Bags.FindBagItemFromTemplate() end
-    if item == SELL_ADD_BAG_ITEM then
-        SEll_LIST_EDIT_MODE = true
-        BasicDebug(SellList["SELLLIST"])
-        Osi.ShowNotification(character, "AUTOSELL - EDIT MODE ON")
-        Ext.OnNextTick(function()
-            Bags.AddAllListItemToBag(SellList["SELLLIST"], SELL_ADD_BAG_ITEM, character)
-        end)
-    end
-end)
-
--- Listener for item uses stop, in this case the closing of our bag counts as it not being used anymore
-Ext.Osiris.RegisterListener("UseFinished", 3, "after", function(character, item, sucess)
-    if SEll_LIST_EDIT_MODE == true and GUID(item) == SELL_ADD_BAG_ITEM then
-        Osi.ShowNotification(character, "AUTOSELL - EDIT MODE OFF")
-        Bags.AddContentToList(SELL_ADD_BAG_ITEM, character)
-        SEll_LIST_EDIT_MODE = false
-    end
-end)
 
 -- Fill an existing bag with items from a list
 function Bags.AddAllListItemToBag(list, bagItem, character)
@@ -231,6 +208,29 @@ function Bags.FindBagItemFromTemplate()
     end
 end
 
+-- Listen for item uses, in this case the opening of our bag counts as it being used
+Ext.Osiris.RegisterListener("UseStarted", 2, "before", function(character, item)
+    item = GUID(item)
+    if not SELL_ADD_BAG_ITEM then Bags.FindBagItemFromTemplate() end
+    if item == SELL_ADD_BAG_ITEM then
+        SEll_LIST_EDIT_MODE = true
+        BasicDebug(SellList["SELLLIST"])
+        Osi.ShowNotification(character, "AUTOSELL - EDIT MODE ON")
+        Ext.OnNextTick(function()
+            Bags.AddAllListItemToBag(SellList["SELLLIST"], SELL_ADD_BAG_ITEM, character)
+        end)
+    end
+end)
+
+-- Listener for item uses stop, in this case the closing of our bag counts as it not being used anymore
+Ext.Osiris.RegisterListener("UseFinished", 3, "after", function(character, item, sucess)
+    if SEll_LIST_EDIT_MODE == true and GUID(item) == SELL_ADD_BAG_ITEM then
+        Osi.ShowNotification(character, "AUTOSELL - EDIT MODE OFF")
+        Bags.AddContentToList(SELL_ADD_BAG_ITEM, character)
+        SEll_LIST_EDIT_MODE = false
+    end
+end)
+
 -- -------------------------------------------------------------------------- --
 --                                   Selling                                  --
 -- -------------------------------------------------------------------------- --
@@ -241,8 +241,7 @@ end
 -- Cache gold value, easy optimization that probably is totally useless
 local itemValueCache = {}
 function HandleSelling(Owner, Character, Root, Item)
-    -- exact is actually exact, total seems to see in the future and combine the next amounts or some shit I don't get it
-    -- difference seems to be related to server ticks and when they get the amount
+    -- exact is actually exact, total is stack total, a stack can be different same items...
     local exactItemAmount, totalAmount = Osi.GetStackAmount(Item)
     exactItemAmount, totalAmount = exactItemAmount or 1, totalAmount or 1
     -- Check cache itemValue is the value of 1 item, even in a stack
@@ -324,7 +323,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
 
     local itemName = RemoveTrailingNumbers(GetItemName(item)) or "BAD MOD"
 
-    --Sanity check
+    --Sanity check, this is probably terrible performance wise
     Bags.FindBagItemFromTemplate()
 
     --Set weights & values of items inside bag to 0 in edit mode
