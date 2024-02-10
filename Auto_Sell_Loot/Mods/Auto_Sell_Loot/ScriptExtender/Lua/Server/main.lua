@@ -526,9 +526,6 @@ local function start(level, isEditor)
     local execTime = MeasureExecutionTime(function()
         InitFilters()
         SQUADIES = GetSquadies()
-        -- Add the bag(s) to the host char if none found in party inventory
-        Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
-        BasicDebug("SELL_VALUE_PERCENTAGE : " .. CONFIG.SELL_VALUE_PERCENTAGE)
         -- Create a set from JUNKTABLE with items from keeplist removed and those from selllist added
         BasicDebug(KeepList)
         BasicDebug(SellList)
@@ -537,7 +534,12 @@ local function start(level, isEditor)
     end)
 
     BasicDebug("Tables loaded and processed, set successfully created in " .. execTime .. " ms!")
+    
     Bags.FindBagItemFromTemplate()
+    if not StringEmpty(SELL_ADD_BAG_ITEM) then
+        Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
+    end
+
     if CONFIG.ENABLE_LOGGING == 1 then
         Files.FlushLogBuffer()
     end
