@@ -27,10 +27,9 @@ local function ensureAllListsExist()
     BasicPrint("EnsureAllListsExist() - Doing the ensuring")
     local sellExists,keepExists,junkExists = false,false,false
     local sellPath,keepPath,junkPath=GetSellPath(),Paths.keeplist_json_file_path,Paths.junk_table_json_file_path
-    local _
-    _,sellExists = Files.Load(sellPath)
-    _,keepExists = Files.Load(keepPath)
-    _,junkExists = Files.Load(junkPath)
+    sellExists = (true==Files.Load(sellPath))
+    keepExists = (true==Files.Load(keepPath))
+    junkExists = (true==Files.Load(junkPath))
     -- Create selllist if it doesn't exist
     if not sellExists then
         InitDefaultFilterList(sellPath, default_sell)
