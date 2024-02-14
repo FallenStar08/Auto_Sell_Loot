@@ -8,6 +8,7 @@ local SELL_VALUE_COUNTER = 0
 local FRACTIONAL_PART = 0
 local SEll_LIST_EDIT_MODE = false
 
+RegisterModVariable("Fallen_AutoSellerInfos")
 
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
@@ -85,8 +86,9 @@ end
 
 --Update bag description with mod infos
 local function UpdateBagInfoScreenWithConfig()
-    local useSaveSpecificSellList = PersistentVars.useSaveSpecificSellList and PersistentVars.useSaveSpecificSellList or "not enabled"
-    local saveIdentifier = PersistentVars.saveIdentifier and PersistentVars.saveIdentifier or "not enabled"
+    local modVars=GetModVariables()
+    local useSaveSpecificSellList = modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList and modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList or "not enabled"
+    local saveIdentifier = modVars.Fallen_AutoSellerInfos.saveIdentifier and modVars.Fallen_AutoSellerInfos.saveIdentifier or "not enabled"
 
     local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
 
@@ -94,8 +96,8 @@ local function UpdateBagInfoScreenWithConfig()
     local bagSellModeColor = CONFIG.BAG_SELL_MODE_ONLY == 1 and "green" or "red"
     local userListColor = CONFIG.CUSTOM_LISTS_ONLY == 1 and "green" or "red"
     local markAsWareColor = CONFIG.MARK_AS_WARE == 1 and "green" or "red"
-    local useSaveSpecificSellListColor = PersistentVars.useSaveSpecificSellList and "green" or "red"
-    local saveIdentifierColor = PersistentVars.saveIdentifier and "green" or "red"
+    local useSaveSpecificSellListColor = modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList and "green" or "red"
+    local saveIdentifierColor = modVars.Fallen_AutoSellerInfos.saveIdentifier and "green" or "red"
     local modEnabledColor = CONFIG.MOD_ENABLED == 1 and "green" or "red"
 
     -- Convert RGB colors to hexadecimal
@@ -458,27 +460,30 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
 
         -- Config user list only
     elseif message == Messages.message_user_list_only then
-        handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY", PersistentVars.useSaveSpecificSellList
+        local modVars=GetModVariables()
+        handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY", modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList
             and Messages.message_save_specific_list_already_exist or Messages.message_save_specific_list)
 
         -- Config save specific list
     elseif message == Messages.message_save_specific_list then
-        if result == 1 and not PersistentVars.saveIdentifier then
+        local modVars=GetModVariables()
+        if result == 1 and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
             local random = Ext.Math.Random(0, 999999999)
-            PersistentVars.saveIdentifier = random
-            PersistentVars.useSaveSpecificSellList = true
+            modVars.Fallen_AutoSellerInfos.saveIdentifier = random
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
             InitDefaultFilterList(GetSellPath(), default_sell)
             LoadUserLists()
-        elseif result == 1 and PersistentVars.saveIdentifier then
-            PersistentVars.useSaveSpecificSellList = true
+        elseif result == 1 and modVars.Fallen_AutoSellerInfos.saveIdentifier then
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
             LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
 
         -- Config save specific list already exist
     elseif message == Messages.message_save_specific_list_already_exist then
+        local modVars=GetModVariables()
         if result == 1 then
-            PersistentVars.useSaveSpecificSellList = false
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
             LoadUserLists()
         end
         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
@@ -511,7 +516,7 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
     elseif message == Messages.message_enable_mod then
         handleConfig(Messages.message_enable_mod, "MOD_ENABLED", nil)
     end
-
+    SyncModVariables()
     UpdateBagInfoScreenWithConfig()
 end)
 
@@ -520,6 +525,8 @@ end)
 --                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
 local function start(level, isEditor)
+    local modVars=GetModVariables()
+    if not modVars.Fallen_AutoSellerInfos then modVars.Fallen_AutoSellerInfos={};SyncModVariables() end
     if level == "SYS_CC_I" then return end
     Messages = ResolveMessagesHandles()
     if not CONFIG then CONFIG=InitConfig() end

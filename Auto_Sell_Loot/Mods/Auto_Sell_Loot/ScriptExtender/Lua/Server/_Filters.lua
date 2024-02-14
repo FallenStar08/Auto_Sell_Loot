@@ -11,11 +11,12 @@ _G.default_keep = {
 
 
 function GetSellPath()
+    local modVars=GetModVariables()
     BasicDebug("GetSellPath()")
     local sellPath=Paths.selllist_json_file_path
-    if PersistentVars.useSaveSpecificSellList == true then
+    if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList == true then
         --Save specific list
-        sellPath = "sell_list_id_"..PersistentVars.saveIdentifier..".json"
+        sellPath = "sell_list_id_"..modVars.Fallen_AutoSellerInfos.saveIdentifier..".json"
     end
     BasicDebug(string.format("GetSellPath() - Sell path : %s",sellPath))
     return sellPath
@@ -26,9 +27,10 @@ local function ensureAllListsExist()
     BasicPrint("EnsureAllListsExist() - Doing the ensuring")
     local sellExists,keepExists,junkExists = false,false,false
     local sellPath,keepPath,junkPath=GetSellPath(),Paths.keeplist_json_file_path,Paths.junk_table_json_file_path
-    sellExists = Files.Load(sellPath)
-    keepExists = Files.Load(keepPath)
-    junkExists = Files.Load(junkPath)
+    local _
+    _,sellExists = Files.Load(sellPath)
+    _,keepExists = Files.Load(keepPath)
+    _,junkExists = Files.Load(junkPath)
     -- Create selllist if it doesn't exist
     if not sellExists then
         InitDefaultFilterList(sellPath, default_sell)
