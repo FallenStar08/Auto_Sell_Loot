@@ -21,7 +21,7 @@ local function GetItemName(item)
 end
 
 local function DeleteItem(Character, Item, Amount)
-    Osi.RequestDelete(Item)
+    Osi.UnloadItem(Item)
 end
 
 --TODO FIND SOMEWHERE SAFE TO HIDE ITEMS
@@ -32,7 +32,7 @@ end
 --Profit
 local function MoveItemToHiddeyHole(Character, Item, Amount)
     --for now...
-    Osi.RequestDelete(Item)
+    Osi.UnloadItem(Item)
     --Osi.ToInventory(Item,NAKED_DUMMY_2)
 end
 
@@ -149,7 +149,7 @@ function Bags.AddContentToList(bagItem, character)
         local templateGuid=data.template
         local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or "0"
         REMOVER_BAG_CONTENT_LIST[template.Name] = GUID(templateGuid)
-        Osi.RequestDelete(uuid)
+        Osi.UnloadItem(uuid)
     end
     local removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
     -- Because people will obvsiously complain they can't add items to the list by having the bag open
@@ -409,26 +409,94 @@ end
 -- -------------------------------------------------------------------------- --
 --                                   Config                                   --
 -- -------------------------------------------------------------------------- --
--- Events
+-- !Events DOESNT WORK ANYMORE 
 -- Osi.MessageBoxChoiceClosed (character, message, resultChoice)	
 -- Osi.MessageBoxClosed (character, message)	
 -- Osi.MessageBoxYesNoClosed (character, message, result)
 
--- Functions
+-- !Functions DOESNT WORK ANYMORE
 -- OpenMessageBox (character, message)	
 -- OpenMessageBoxChoice (character, message, choice1, choice2)	
 -- OpenMessageBoxYesNo (character, message)
+
+
+--New function (P6+)
+
+-- Osi.ReadyCheckSpecific (eventId, translationId, force, initiator, character1, character2, character3)
+-- Parameters:
+-- eventId string
+-- translationId string
+-- force integer
+-- initiator CHARACTER
+-- character1 CHARACTER
+-- character2 CHARACTER
+-- character3 CHARACTER
+
+--New event (P6+)
+-- Osi.ReadyCheckFailed (id)
+-- Osi.ReadyCheckPassed (id)
+
+
+---Guess this is my life now
+---@param eventId string
+---@param content string
+---@param force? number
+---@param initiation? GUIDSTRING --Char who initatittititited the box idk fuck this shit garbage ass function fuck 
+---@param char1? GUIDSTRING
+---@param char2? GUIDSTRING
+---@param char3? GUIDSTRING
+local function FallenMessageBox(eventId,content,initiation,char1,char2,char3,force)
+    force=force or 1
+    initiation=initiation or Osi.GetHostCharacter()
+    char1=char1 or ""
+    char2=char2 or ""
+    char3=char3 or ""
+    Osi.ReadyCheckSpecific(eventId,content,force,initiation,char1,char2,char3)
+end
+
 
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
     function(caster, target, spell, spellType, spellElement, storyActionID)
         if GUID(caster) == GUID(Osi.GetHostCharacter()) and GUID(target) == SELL_ADD_BAG_ITEM then
             if CONFIG.MOD_ENABLED == 1 then
-                Osi.OpenMessageBoxYesNo(caster, Messages.message_warning_config_start)
+                FallenMessageBox("message_warning_config_start",Messages.message_warning_config_start,caster)
+                --Osi.OpenMessageBoxYesNo(caster, Messages.message_warning_config_start)
             else
-                Osi.OpenMessageBoxYesNo(caster, Messages.message_enable_mod)
+                FallenMessageBox("message_enable_mod",Messages.message_enable_mod,caster)
             end
         end
     end)
+
+Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id) 
+    if id == "message_warning_config_start" then
+        FallenMessageBox("message_bag_sell_mode", content, initiation?, char1?, char2?, char3?, force?)
+    elseif id == "message_enable_mod" then
+        --etc
+    elseif id == "message_bag_sell_mode" then
+
+    elseif id == "message_mark_as_ware" then
+
+    elseif id == "message_user_list_only" then
+
+    elseif id == "message_save_specific_list_already_exist" then
+
+    elseif id == "message_save_specific_list" then
+
+    elseif id == "message_clear_sell_list" then
+
+    elseif id == "message_delete_bag" then
+
+    elseif id == "message_disable_mod" then
+
+    end
+end)
+
+Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id) 
+
+    --same here
+
+
+end)
 
 Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
     local function handleConfig(configMessage, configValue, nextMessage)
@@ -499,7 +567,7 @@ Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(charac
         --Delete Bag
     elseif message == Messages.message_delete_bag then
         if result == 1 then
-            Osi.RequestDelete(SELL_ADD_BAG_ITEM)
+            Osi.UnloadItem(SELL_ADD_BAG_ITEM)
             local choice = result == 1 and 0 or 1
             CONFIG["MOD_ENABLED"] = choice
         else
