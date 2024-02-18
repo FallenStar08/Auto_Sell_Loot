@@ -524,10 +524,12 @@ Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
     elseif id == "message_delete_bag" then
         Osi.UnloadItem(SELL_ADD_BAG_ITEM)
         CONFIG["MOD_ENABLED"] = 0
+        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
         INITIATIOR=nil
         --! END 1
     elseif id == "message_disable_mod" then
         CONFIG["MOD_ENABLED"] = 0
+        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
         INITIATIOR=nil
         --! END 2
     end
@@ -537,7 +539,7 @@ end)
 
 Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
     if id == "message_warning_config_start" then
-        FallenMessageBox("message_bag_sell_mode", Messages.message_bag_sell_mode, INITIATIOR)
+        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
     elseif id == "message_enable_mod" then
         CONFIG["MOD_ENABLED"] = 1
     elseif id == "message_bag_sell_mode" then
@@ -574,102 +576,104 @@ Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
         Messages.message_disable_mod, INITIATIOR)
     elseif id == "message_disable_mod" then
         -- CONFIG["MOD_ENABLED"] = 0
+        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
         INITIATIOR=nil
         --! END 2
     end
     SyncModVariables()
     UpdateBagInfoScreenWithConfig()
+    
 end)
+--! OLD pre P5 when the game was still good
+-- Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
+--     local function handleConfig(configMessage, configValue, nextMessage)
+--         if message == configMessage then
+--             CONFIG[configValue] = result
+--             --CONFIG:save()
+--             if nextMessage then
+--                 Osi.OpenMessageBoxYesNo(character, nextMessage)
+--             else
+--                 if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
+--             end
+--         end
+--     end
 
-Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
-    local function handleConfig(configMessage, configValue, nextMessage)
-        if message == configMessage then
-            CONFIG[configValue] = result
-            --CONFIG:save()
-            if nextMessage then
-                Osi.OpenMessageBoxYesNo(character, nextMessage)
-            else
-                if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
-            end
-        end
-    end
+--     -- Config Start
+--     if message == Messages.message_warning_config_start then
+--         if result == 1 then
+--             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
+--         else
+--             if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
+--         end
 
-    -- Config Start
-    if message == Messages.message_warning_config_start then
-        if result == 1 then
-            Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
-        else
-            if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
-        end
+--         -- Config Sell mode only
+--     elseif message == Messages.message_bag_sell_mode then
+--         handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_mark_as_ware)
+--     elseif message == Messages.message_mark_as_ware then
+--         handleConfig(Messages.message_mark_as_ware, "MARK_AS_WARE", Messages.message_user_list_only)
 
-        -- Config Sell mode only
-    elseif message == Messages.message_bag_sell_mode then
-        handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_mark_as_ware)
-    elseif message == Messages.message_mark_as_ware then
-        handleConfig(Messages.message_mark_as_ware, "MARK_AS_WARE", Messages.message_user_list_only)
+--         -- Config user list only
+--     elseif message == Messages.message_user_list_only then
+--         local modVars = GetModVariables()
+--         handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY",
+--             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList
+--             and Messages.message_save_specific_list_already_exist or Messages.message_save_specific_list)
 
-        -- Config user list only
-    elseif message == Messages.message_user_list_only then
-        local modVars = GetModVariables()
-        handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY",
-            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList
-            and Messages.message_save_specific_list_already_exist or Messages.message_save_specific_list)
+--         -- Config save specific list
+--     elseif message == Messages.message_save_specific_list then
+--         local modVars = GetModVariables()
+--         if result == 1 and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
+--             local random = Ext.Math.Random(0, 999999999)
+--             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
+--             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
+--             InitDefaultFilterList(GetSellPath(), default_sell)
+--             LoadUserLists()
+--         elseif result == 1 and modVars.Fallen_AutoSellerInfos.saveIdentifier then
+--             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
+--             LoadUserLists()
+--         end
+--         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
 
-        -- Config save specific list
-    elseif message == Messages.message_save_specific_list then
-        local modVars = GetModVariables()
-        if result == 1 and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
-            local random = Ext.Math.Random(0, 999999999)
-            modVars.Fallen_AutoSellerInfos.saveIdentifier = random
-            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
-            InitDefaultFilterList(GetSellPath(), default_sell)
-            LoadUserLists()
-        elseif result == 1 and modVars.Fallen_AutoSellerInfos.saveIdentifier then
-            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
-            LoadUserLists()
-        end
-        Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
+--         -- Config save specific list already exist
+--     elseif message == Messages.message_save_specific_list_already_exist then
+--         local modVars = GetModVariables()
+--         if result == 1 then
+--             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
+--             LoadUserLists()
+--         end
+--         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
 
-        -- Config save specific list already exist
-    elseif message == Messages.message_save_specific_list_already_exist then
-        local modVars = GetModVariables()
-        if result == 1 then
-            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
-            LoadUserLists()
-        end
-        Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
+--         -- Config clear list
+--     elseif message == Messages.message_clear_sell_list then
+--         if result == 1 then
+--             InitDefaultFilterList(GetSellPath(), default_sell)
+--             SellList.SELLLIST = {}
+--             JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
+--         end
+--         Osi.OpenMessageBoxYesNo(character, Messages.message_delete_bag)
+--         --Delete Bag
+--     elseif message == Messages.message_delete_bag then
+--         if result == 1 then
+--             Osi.UnloadItem(SELL_ADD_BAG_ITEM)
+--             local choice = result == 1 and 0 or 1
+--             CONFIG["MOD_ENABLED"] = choice
+--         else
+--             Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
+--         end
 
-        -- Config clear list
-    elseif message == Messages.message_clear_sell_list then
-        if result == 1 then
-            InitDefaultFilterList(GetSellPath(), default_sell)
-            SellList.SELLLIST = {}
-            JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
-        end
-        Osi.OpenMessageBoxYesNo(character, Messages.message_delete_bag)
-        --Delete Bag
-    elseif message == Messages.message_delete_bag then
-        if result == 1 then
-            Osi.UnloadItem(SELL_ADD_BAG_ITEM)
-            local choice = result == 1 and 0 or 1
-            CONFIG["MOD_ENABLED"] = choice
-        else
-            Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
-        end
+--         -- Disable mod
+--     elseif message == Messages.message_disable_mod then
+--         local choice = result == 1 and 0 or 1
+--         CONFIG["MOD_ENABLED"] = choice
+--         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
 
-        -- Disable mod
-    elseif message == Messages.message_disable_mod then
-        local choice = result == 1 and 0 or 1
-        CONFIG["MOD_ENABLED"] = choice
-        if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
-
-        -- Re-enable mod
-    elseif message == Messages.message_enable_mod then
-        handleConfig(Messages.message_enable_mod, "MOD_ENABLED", nil)
-    end
-    SyncModVariables()
-    UpdateBagInfoScreenWithConfig()
-end)
+--         -- Re-enable mod
+--     elseif message == Messages.message_enable_mod then
+--         handleConfig(Messages.message_enable_mod, "MOD_ENABLED", nil)
+--     end
+--     SyncModVariables()
+--     UpdateBagInfoScreenWithConfig()
+-- end)
 
 
 -- -------------------------------------------------------------------------- --
