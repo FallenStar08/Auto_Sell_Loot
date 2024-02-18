@@ -524,12 +524,12 @@ Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
     elseif id == "message_delete_bag" then
         Osi.UnloadItem(SELL_ADD_BAG_ITEM)
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
+        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
         INITIATIOR=nil
         --! END 1
     elseif id == "message_disable_mod" then
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
+        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
         INITIATIOR=nil
         --! END 2
     end
@@ -539,7 +539,7 @@ end)
 
 Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
     if id == "message_warning_config_start" then
-        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
+        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
     elseif id == "message_enable_mod" then
         CONFIG["MOD_ENABLED"] = 1
     elseif id == "message_bag_sell_mode" then
@@ -576,7 +576,7 @@ Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
         Messages.message_disable_mod, INITIATIOR)
     elseif id == "message_disable_mod" then
         -- CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(INITIATIOR or Osi.GetHostCharacter(),SELL_ADD_BAG_ITEM)
+        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
         INITIATIOR=nil
         --! END 2
     end
