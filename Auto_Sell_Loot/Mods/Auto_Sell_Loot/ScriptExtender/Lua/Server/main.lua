@@ -186,7 +186,7 @@ end
 function Bags.AddBag(bag, character, notification)
     if CONFIG.GIVE_BAG >= 1 then
         for _, player in pairs(SQUADIES) do if Osi.TemplateIsInInventory(bag, player) >= 1 then return end end
-        BasicPrint("Bags.AddBag() Bag : " .. bag .. " adding to character : " .. character)
+        BasicPrint(string.format("Bags.AddBag() Adding bag : %s to character : %s",bag,character ))
         Osi.TemplateAddTo(bag, character, 1, notification)
     else
         BasicPrint("Bags.AddBag() - Bag disabled in config file")
@@ -706,8 +706,9 @@ local function start(level, isEditor)
     if StringEmpty(SELL_ADD_BAG_ITEM) then
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
     end
-    Bags.FindBagItemFromTemplate()
-
+    DelayedCall(333, function() 
+        Bags.FindBagItemFromTemplate()
+    end)
     if CONFIG.ENABLE_LOGGING == 1 then
         Files.FlushLogBuffer()
     end
