@@ -12,7 +12,6 @@ _G.default_keep = {
 
 function GetSellPath()
     local modVars=GetModVariables()
-    BasicDebug("GetSellPath()")
     local sellPath=Paths.selllist_json_file_path
     if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList == true then
         --Save specific list

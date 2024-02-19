@@ -30,10 +30,8 @@ end
 --Zap back pouch inventory to dummy
 --Nuke pouch
 --Profit
-local function MoveItemToHiddeyHole(Character, Item, Amount)
-    --for now...
-    Osi.UnloadItem(Item)
-    --Osi.ToInventory(Item,NAKED_DUMMY_2)
+local function MoveItemToHiddeyHole(character, item, amount)
+    Osi.RequestDelete(item)
 end
 
 -- function Bags.MoveNakedManItemsToBag(bag)
@@ -152,15 +150,21 @@ end
 
 function Bags.AddContentToList(bagItem, character)
     local REMOVER_BAG_CONTENT_LIST = {}
+    local removedItems = {}
     local bagInv = DeepIterateInventory(_GE(bagItem))
-    for uuid, data in pairs(bagInv) do
-        local templateGuid = data.template
-        local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or
-            "0"
-        REMOVER_BAG_CONTENT_LIST[template.Name] = GUID(templateGuid)
-        Osi.UnloadItem(uuid)
+    if next(bagInv) then
+        for uuid, data in pairs(bagInv) do
+            local templateGuid = data.template
+            local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or
+                "0"
+            REMOVER_BAG_CONTENT_LIST[template.Name] = GUID(templateGuid)
+            MoveItemToHiddeyHole(bagItem, uuid, 99999999)
+        end
+        Osi.CharacterRemoveTaggedItems(character, FALLEN_TAGS["FALLEN_MARK_FOR_DELETION"], 10000000)
     end
-    local removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
+    if next(REMOVER_BAG_CONTENT_LIST) then
+        removedItems = Table.CompareSets(SellList["SELLLIST"], REMOVER_BAG_CONTENT_LIST)
+    end
     -- Because people will obvsiously complain they can't add items to the list by having the bag open
     -- Anticipating next complain being the fact that it doesn't pay them this way
     -- Fuck that, not doing it... yet? :')
@@ -182,10 +186,10 @@ end
 function Bags.AddBag(bag, character, notification)
     if CONFIG.GIVE_BAG >= 1 then
         for _, player in pairs(SQUADIES) do if Osi.TemplateIsInInventory(bag, player) >= 1 then return end end
-        BasicDebug("Bags.AddBag() Bag : " .. bag .. " adding to character : " .. character)
+        BasicPrint("Bags.AddBag() Bag : " .. bag .. " adding to character : " .. character)
         Osi.TemplateAddTo(bag, character, 1, notification)
     else
-        BasicDebug("Bags.AddBag() - Bag disabled in config file")
+        BasicPrint("Bags.AddBag() - Bag disabled in config file")
     end
 end
 
@@ -520,17 +524,17 @@ Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
         SellList.SELLLIST = {}
         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
         FallenMessageBox("message_delete_bag",
-        Messages.message_delete_bag, INITIATIOR)
+            Messages.message_delete_bag, INITIATIOR)
     elseif id == "message_delete_bag" then
         Osi.UnloadItem(SELL_ADD_BAG_ITEM)
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR=nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
+        INITIATIOR = nil
         --! END 1
     elseif id == "message_disable_mod" then
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR=nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
+        INITIATIOR = nil
         --! END 2
     end
     SyncModVariables()
@@ -539,7 +543,7 @@ end)
 
 Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
     if id == "message_warning_config_start" then
-        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
     elseif id == "message_enable_mod" then
         CONFIG["MOD_ENABLED"] = 1
     elseif id == "message_bag_sell_mode" then
@@ -566,23 +570,22 @@ Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
         SellList.SELLLIST = {}
         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
         FallenMessageBox("message_delete_bag",
-                Messages.message_delete_bag, INITIATIOR)
+            Messages.message_delete_bag, INITIATIOR)
     elseif id == "message_delete_bag" then
         -- Osi.UnloadItem(SELL_ADD_BAG_ITEM)
         -- CONFIG["MOD_ENABLED"] = 0
         -- INITIATIOR=nil
         --! END 1
         FallenMessageBox("message_disable_mod",
-        Messages.message_disable_mod, INITIATIOR)
+            Messages.message_disable_mod, INITIATIOR)
     elseif id == "message_disable_mod" then
         -- CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(SELL_ADD_BAG_ITEM,INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR=nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
+        INITIATIOR = nil
         --! END 2
     end
     SyncModVariables()
     UpdateBagInfoScreenWithConfig()
-    
 end)
 --! OLD pre P5 when the game was still good
 -- Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
@@ -698,11 +701,12 @@ local function start(level, isEditor)
     end)
 
     BasicDebug("Tables loaded and processed, set successfully created in " .. execTime .. " ms!")
-
+    --TODO This is terrible, rewrite all of this
     Bags.FindBagItemFromTemplate()
-    if not StringEmpty(SELL_ADD_BAG_ITEM) then
+    if StringEmpty(SELL_ADD_BAG_ITEM) then
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
     end
+    Bags.FindBagItemFromTemplate()
 
     if CONFIG.ENABLE_LOGGING == 1 then
         Files.FlushLogBuffer()
