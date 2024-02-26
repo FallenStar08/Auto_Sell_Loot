@@ -193,6 +193,18 @@ function Bags.AddBag(bag, character, notification)
     end
 end
 
+-- Iterate through the inventory of the party members and mark all copies of the item as ware
+function Bags.MarkExistingItemsAsWare(root)
+    for _, player in pairs(SQUADIES) do
+        local squadieInv = DeepIterateInventory(_GE(player))
+        for uuid, data in pairs(squadieInv) do
+            if data.template == root then
+                MarkAsWare(data.entity)
+            end
+        end
+    end
+end
+
 function Bags.AddToSellList(item_name, root, item, bagOwner)
     if CONFIG.BAG_SELL_MODE_ONLY == 1 then return end
     if StringEmpty(item_name) then
@@ -206,7 +218,12 @@ function Bags.AddToSellList(item_name, root, item, bagOwner)
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
     if CONFIG.MARK_AS_WARE == 1 then
-        DelayedCall(500, function() Osi.ToInventory(item, bagOwner, 99999999) end)
+        DelayedCall(500, function()
+            Osi.ToInventory(item, bagOwner, 99999999)
+            if CONFIG.MARK_AS_WARE==1 then
+                Bags.MarkExistingItemsAsWare(root)
+            end
+        end)
     end
 end
 
