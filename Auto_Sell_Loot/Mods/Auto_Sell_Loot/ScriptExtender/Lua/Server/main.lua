@@ -566,9 +566,6 @@ Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
     elseif id == "message_save_specific_list" then
         FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATIOR)
     elseif id == "message_clear_sell_list" then
-        InitDefaultFilterList(GetSellPath(), default_sell)
-        SellList.SELLLIST = {}
-        JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
         FallenMessageBox("message_delete_bag",
             Messages.message_delete_bag, INITIATIOR)
     elseif id == "message_delete_bag" then
