@@ -219,7 +219,6 @@ function Bags.AddToSellList(item_name, root, item, bagOwner)
     if CONFIG.MARK_AS_WARE == 1 then
         DelayedCall(500, function() Osi.ToInventory(item, bagOwner, 99999999)
         Bags.MarkExistingItemsAsWare(root)
-        
         end)
     end
 end
