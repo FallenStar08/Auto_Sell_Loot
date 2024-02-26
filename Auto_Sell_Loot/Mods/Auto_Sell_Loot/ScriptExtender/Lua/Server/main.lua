@@ -192,7 +192,6 @@ function Bags.AddBag(bag, character, notification)
         BasicPrint("Bags.AddBag() - Bag disabled in config file")
     end
 end
-
 -- Iterate through the inventory of the party members and mark all copies of the item as ware
 function Bags.MarkExistingItemsAsWare(root)
     for _, player in pairs(SQUADIES) do
