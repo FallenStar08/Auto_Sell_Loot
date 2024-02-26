@@ -474,7 +474,6 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
         if GUID(caster) == GUID(Osi.GetHostCharacter()) and GUID(target) == SELL_ADD_BAG_ITEM then
             if CONFIG.MOD_ENABLED == 1 then
                 FallenMessageBox("message_warning_config_start", Messages.message_warning_config_start, caster)
-                --Osi.OpenMessageBoxYesNo(caster, Messages.message_warning_config_start)
             else
                 FallenMessageBox("message_enable_mod", Messages.message_enable_mod, caster)
             end
@@ -569,14 +568,10 @@ Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
         FallenMessageBox("message_delete_bag",
             Messages.message_delete_bag, INITIATIOR)
     elseif id == "message_delete_bag" then
-        -- Osi.UnloadItem(SELL_ADD_BAG_ITEM)
-        -- CONFIG["MOD_ENABLED"] = 0
-        -- INITIATIOR=nil
         --! END 1
         FallenMessageBox("message_disable_mod",
             Messages.message_disable_mod, INITIATIOR)
     elseif id == "message_disable_mod" then
-        -- CONFIG["MOD_ENABLED"] = 0
         Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
         INITIATIOR = nil
         --! END 2
