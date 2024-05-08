@@ -152,7 +152,7 @@ function Bags.AddContentToList(bagItem, character)
     local REMOVER_BAG_CONTENT_LIST = {}
     local removedItems = {}
     local bagInv = DeepIterateInventory(_GE(bagItem))
-    if next(bagInv) then
+    if bagInv and next(bagInv) then
         for uuid, data in pairs(bagInv) do
             local templateGuid = data.template
             local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or
@@ -186,16 +186,18 @@ end
 function Bags.AddBag(bag, character, notification)
     if CONFIG.GIVE_BAG >= 1 then
         for _, player in pairs(SQUADIES) do if Osi.TemplateIsInInventory(bag, player) >= 1 then return end end
-        BasicPrint(string.format("Bags.AddBag() Adding bag : %s to character : %s",bag,character ))
+        BasicPrint(string.format("Bags.AddBag() Adding bag : %s to character : %s", bag, character))
         Osi.TemplateAddTo(bag, character, 1, notification)
     else
         BasicPrint("Bags.AddBag() - Bag disabled in config file")
     end
 end
+
 -- Iterate through the inventory of the party members and mark all copies of the item as ware
 function Bags.MarkExistingItemsAsWare(root)
     for _, player in pairs(SQUADIES) do
         local squadieInv = DeepIterateInventory(_GE(player))
+        if not squadieInv then return end
         for uuid, data in pairs(squadieInv) do
             if data.template == root then
                 MarkAsWare(data.entity)
@@ -217,8 +219,9 @@ function Bags.AddToSellList(item_name, root, item, bagOwner)
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
     if CONFIG.MARK_AS_WARE == 1 then
-        DelayedCall(500, function() Osi.ToInventory(item, bagOwner, 99999999)
-        Bags.MarkExistingItemsAsWare(root)
+        DelayedCall(500, function()
+            Osi.ToInventory(item, bagOwner, 99999999)
+            Bags.MarkExistingItemsAsWare(root)
         end)
     end
 end
@@ -477,7 +480,7 @@ local function FallenMessageBox(eventId, content, initiation, char1, char2, char
     char1 = char1 or ""
     char2 = char2 or ""
     char3 = char3 or ""
-    _G.INITIATIOR = initiation
+    _G.INITIATOR = initiation
     Osi.ReadyCheckSpecific(eventId, content, force, initiation, char1, char2, char3)
 end
 
@@ -495,29 +498,29 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
 
 Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
     if id == "message_warning_config_start" then
-        FallenMessageBox("message_bag_sell_mode", Messages.message_bag_sell_mode, INITIATIOR)
+        FallenMessageBox("message_bag_sell_mode", Messages.message_bag_sell_mode, INITIATOR)
     elseif id == "message_enable_mod" then
         CONFIG["MOD_ENABLED"] = 1
     elseif id == "message_bag_sell_mode" then
         CONFIG["BAG_SELL_MODE_ONLY"] = 1
-        FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATIOR)
+        FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATOR)
     elseif id == "message_mark_as_ware" then
         CONFIG["MARK_AS_WARE"] = 1
-        FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATIOR)
+        FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATOR)
     elseif id == "message_user_list_only" then
         CONFIG["CUSTOM_LISTS_ONLY"] = 1
         local modVars = GetModVariables()
         if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList then
             FallenMessageBox("message_save_specific_list_already_exist",
-                Messages.message_save_specific_list_already_exist, INITIATIOR)
+                Messages.message_save_specific_list_already_exist, INITIATOR)
         else
-            FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATIOR)
+            FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATOR)
         end
     elseif id == "message_save_specific_list_already_exist" then
         local modVars = GetModVariables()
         modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
         LoadUserLists()
-        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATIOR)
+        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
     elseif id == "message_save_specific_list" then
         local modVars = GetModVariables()
         if not modVars.Fallen_AutoSellerInfos.saveIdentifier then
@@ -530,23 +533,23 @@ Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
             LoadUserLists()
         end
-        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATIOR)
+        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
     elseif id == "message_clear_sell_list" then
         InitDefaultFilterList(GetSellPath(), default_sell)
         SellList.SELLLIST = {}
         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
         FallenMessageBox("message_delete_bag",
-            Messages.message_delete_bag, INITIATIOR)
+            Messages.message_delete_bag, INITIATOR)
     elseif id == "message_delete_bag" then
         Osi.UnloadItem(SELL_ADD_BAG_ITEM)
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR = nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
+        INITIATOR = nil
         --! END 1
     elseif id == "message_disable_mod" then
         CONFIG["MOD_ENABLED"] = 0
-        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR = nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
+        INITIATOR = nil
         --! END 2
     end
     SyncModVariables()
@@ -555,38 +558,38 @@ end)
 
 Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
     if id == "message_warning_config_start" then
-        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
     elseif id == "message_enable_mod" then
         CONFIG["MOD_ENABLED"] = 1
     elseif id == "message_bag_sell_mode" then
         CONFIG["BAG_SELL_MODE_ONLY"] = 0
-        FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATIOR)
+        FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATOR)
     elseif id == "message_mark_as_ware" then
         CONFIG["MARK_AS_WARE"] = 0
-        FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATIOR)
+        FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATOR)
     elseif id == "message_user_list_only" then
         CONFIG["CUSTOM_LISTS_ONLY"] = 0
         local modVars = GetModVariables()
         if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList then
             FallenMessageBox("message_save_specific_list_already_exist",
-                Messages.message_save_specific_list_already_exist, INITIATIOR)
+                Messages.message_save_specific_list_already_exist, INITIATOR)
         else
-            FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATIOR)
+            FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATOR)
         end
     elseif id == "message_save_specific_list_already_exist" then
-        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATIOR)
+        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
     elseif id == "message_save_specific_list" then
-        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATIOR)
+        FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
     elseif id == "message_clear_sell_list" then
         FallenMessageBox("message_delete_bag",
-            Messages.message_delete_bag, INITIATIOR)
+            Messages.message_delete_bag, INITIATOR)
     elseif id == "message_delete_bag" then
         --! END 1
         FallenMessageBox("message_disable_mod",
-            Messages.message_disable_mod, INITIATIOR)
+            Messages.message_disable_mod, INITIATOR)
     elseif id == "message_disable_mod" then
-        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATIOR or Osi.GetHostCharacter())
-        INITIATIOR = nil
+        Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
+        INITIATOR = nil
         --! END 2
     end
     SyncModVariables()
@@ -711,7 +714,7 @@ local function start(level, isEditor)
     if StringEmpty(SELL_ADD_BAG_ITEM) then
         Bags.AddBag(SELL_ADD_BAG_ROOT, Osi.GetHostCharacter(), 1)
     end
-    DelayedCall(333, function() 
+    DelayedCall(333, function()
         Bags.FindBagItemFromTemplate()
     end)
     if CONFIG.ENABLE_LOGGING == 1 then
