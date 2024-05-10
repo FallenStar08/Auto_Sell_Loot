@@ -11,21 +11,21 @@ _G.default_keep = {
 
 
 function GetSellPath()
-    local modVars=GetModVariables()
-    local sellPath=Paths.selllist_json_file_path
+    local modVars = GetModVariables()
+    local sellPath = Paths.selllist_json_file_path
     if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList == true then
         --Save specific list
-        sellPath = "sell_list_id_"..modVars.Fallen_AutoSellerInfos.saveIdentifier..".json"
+        sellPath = "sell_list_id_" .. modVars.Fallen_AutoSellerInfos.saveIdentifier .. ".json"
     end
-    BasicDebug(string.format("GetSellPath() - Sell path : %s",sellPath))
+    BasicDebug(string.format("GetSellPath() - Sell path : %s", sellPath))
     return sellPath
 end
 
 ---Ensure all of our lists exist and create them if not, also validate their structure.
 local function ensureAllListsExist()
     BasicPrint("EnsureAllListsExist() - Doing the ensuring")
-    local sellExists,keepExists,junkExists = false,false,false
-    local sellPath,keepPath,junkPath=GetSellPath(),Paths.keeplist_json_file_path,Paths.junk_table_json_file_path
+    local sellExists, keepExists, junkExists = false, false, false
+    local sellPath, keepPath, junkPath = GetSellPath(), Paths.keeplist_json_file_path, Paths.junk_table_json_file_path
     sellExists = (Files.Load(sellPath) ~= nil)
     keepExists = (Files.Load(keepPath) ~= nil)
     junkExists = (Files.Load(junkPath) ~= nil)
@@ -78,13 +78,13 @@ function InitDefaultFilterList(filePath, table)
 end
 
 function LoadUserLists()
-    local sellPath,keepPath=GetSellPath(),Paths.keeplist_json_file_path
+    local sellPath, keepPath = GetSellPath(), Paths.keeplist_json_file_path
     BasicPrint("LoadUserLists() - Loading user filter lists...")
     KeepList = JSON.LuaTableFromFile(keepPath)
     -- In theory, this isn't possible since we call EnsureAllListsExist before but you never know...
     if not KeepList then
         BasicError("LoadUserLists() - keeplist wasn't valid, generating a blank one...")
-        InitDefaultFilterList(Paths.keeplist_json_file_path,default_keep)
+        InitDefaultFilterList(Paths.keeplist_json_file_path, default_keep)
     end
     SellList = JSON.LuaTableFromFile(sellPath)
     if not SellList then
@@ -94,8 +94,18 @@ function LoadUserLists()
     BasicPrint("LoadUserLists() - User lists loaded!")
 end
 
+function ProcessTables(baseTable, keeplistTable, selllistTable)
+    -- User Lists only, clear baseTable
+    if MCMCONFIG:GetSettingValue("CUSTOM_LISTS_ONLY", MOD_INFO.MOD_UUID) == true then baseTable = {} end
+
+    --Merge sell entries to the base list
+    for name, uid in pairs(selllistTable) do baseTable[name] = uid end
+    --Merge keep entries to the base list
+    for name, uid in pairs(keeplistTable) do baseTable[name] = nil end
+    return baseTable
+end
+
 function InitFilters()
     ensureAllListsExist()
     LoadUserLists()
 end
-

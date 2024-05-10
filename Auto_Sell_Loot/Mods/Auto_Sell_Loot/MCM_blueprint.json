@@ -1,0 +1,88 @@
+{
+    "SchemaVersion": 1,
+    "ModName": "Auto Loot Seller",
+    "Tabs": [
+        {
+            "TabName": "General",
+            "TabId": "general",
+            "Settings": [
+                {
+                    "Id": "MOD_ENABLED",
+                    "Name": "Enable mod",
+                    "Type": "checkbox",
+                    "Default": true,
+                    "Description": "Toggle the mod on/off without uninstalling it.",
+                    "Tooltip": "Toggle the mod on/off"
+                }
+            ]
+        },
+        {
+            "TabName": "Features",
+            "TabId": "features",
+            "Sections": [
+                {
+                    "SectionId": "GENERAL_SETTINGS",
+                    "SectionName": "Auto Loot Seller features",
+                    "Settings": [
+                        {
+                            "Id": "SELL_VALUE_PERCENTAGE",
+                            "Name": "Sold items value percentage",
+                            "Type": "slider_int",
+                            "Default": 40,
+                            "Tooltip": "The percentage of the item's value you'll get when it is automatically sold",
+                            "Options": {
+                                "Min": 0,
+                                "Max": 100
+                            }
+                        },
+                        {
+                            "Id": "BAG_SELL_MODE_ONLY",
+                            "Name": "Manual selling only",
+                            "Type": "checkbox",
+                            "Default": false,
+                            "Tooltip": "If enabled the mod won't automatically sell items, you'll be able to sell them by dragging them into the bag."
+                        },
+                        {
+                            "Id": "CUSTOM_LISTS_ONLY",
+                            "Name": "Only use custom lists",
+                            "Type": "checkbox",
+                            "Default": false,
+                            "Tooltip": "If enabled the mod won't use the internal list of junk items and will only use the ones you added to it."
+                        },
+                        {
+                            "Id": "MARK_AS_WARE",
+                            "Name": "Mark items as ware instead of selling them",
+                            "Type": "checkbox",
+                            "Default": false,
+                            "Tooltip": "If enabled the items will be marked for sale instead of being automatically sold."
+                        },
+                        {
+                            "Id": "SAVE_SPECIFIC_LIST",
+                            "Name": "Use a save specific personal list.",
+                            "Type": "checkbox",
+                            "Default": false,
+                            "Tooltip": "If enabled your sell list will only apply to this save starting from when this option is enabled."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TabName": "Debug",
+            "TabId": "debug",
+            "Settings": [
+                {
+                    "Id": "debug_level",
+                    "Name": "Debug level",
+                    "Type": "slider_int",
+                    "Default": 3,
+                    "Tooltip": "Debug level for the mod, used mainly for determining which messages to print",
+                    "Options": {
+                        "Min": 0,
+                        "Max": 4
+                    }
+                }
+            ]
+        }
+    ]
+}
