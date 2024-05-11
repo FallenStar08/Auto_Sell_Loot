@@ -742,7 +742,7 @@ Ext.Events.ResetCompleted:Subscribe(start)
 
 Ext.RegisterNetListener("MCM_Saved_Setting", function(call, payload)
     local data = Ext.Json.Parse(payload)
-    if not data or data.modGUID ~= MOD_INFO.MOD_UUID or not data.settingName then
+    if not data or data.modGUID ~= MOD_INFO.MOD_UUID or not data.settingId then
         return
     end
 
