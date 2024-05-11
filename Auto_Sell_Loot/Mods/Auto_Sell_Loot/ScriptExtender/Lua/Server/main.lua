@@ -690,6 +690,15 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
 --                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
 local function start(level, isEditor)
+    Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Features", function(tabHeader)
+        local myCustomWidget = tabHeader:AddButton("My custom widget")
+        myCustomWidget.OnClick = function()
+            _D("My custom widget was clicked!")
+        end
+    end)
+
+
+
     local modVars = GetModVariables()
     if not modVars.Fallen_AutoSellerInfos then
         modVars.Fallen_AutoSellerInfos = {}; SyncModVariables()
@@ -725,3 +734,36 @@ end
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", start)
 
 Ext.Events.ResetCompleted:Subscribe(start)
+
+
+-- -------------------------------------------------------------------------- --
+--                                     MCM                                    --
+-- -------------------------------------------------------------------------- --
+
+Ext.RegisterNetListener("MCM_Saved_Setting", function(call, payload)
+    local data = Ext.Json.Parse(payload)
+    if not data or data.modGUID ~= MOD_INFO.MOD_UUID or not data.settingName then
+        return
+    end
+
+
+
+    if data.settingId == "SAVE_SPECIFIC_LIST" then
+        local modVars = GetModVariables()
+        if data.value == true and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
+            local random = Ext.Math.Random(0, 999999999)
+            modVars.Fallen_AutoSellerInfos.saveIdentifier = random
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
+            InitDefaultFilterList(GetSellPath(), default_sell)
+            LoadUserLists()
+        elseif data.value == true and modVars.Fallen_AutoSellerInfos.saveIdentifier then
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
+            LoadUserLists()
+        elseif data.value == false then
+            modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
+            LoadUserLists()
+        end
+    end
+
+    UpdateBagInfoScreenWithConfig()
+end)
