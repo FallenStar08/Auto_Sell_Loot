@@ -12,7 +12,10 @@
                     "Type": "checkbox",
                     "Default": true,
                     "Description": "Toggle the mod on/off without uninstalling it.",
-                    "Tooltip": "Toggle the mod on/off"
+                    "Handles": {
+                        "NameHandle": "h56b2bab51888486da0104d9e6990f1d93151",
+                        "DescriptionHandle": "h22361e3d777f4387bab90f50f71e5afb76db"
+                    }
                 }
             ]
         },
