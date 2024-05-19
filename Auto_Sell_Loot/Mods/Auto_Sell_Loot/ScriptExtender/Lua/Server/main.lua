@@ -432,271 +432,12 @@ local function addItemsUsedInModsToKeepListIfLoaded()
     end
 end
 
-
-
--- -------------------------------------------------------------------------- --
---                                   Config                                   --
--- -------------------------------------------------------------------------- --
--- !Events DOESNT WORK ANYMORE
--- Osi.MessageBoxChoiceClosed (character, message, resultChoice)	
--- Osi.MessageBoxClosed (character, message)	
--- Osi.MessageBoxYesNoClosed (character, message, result)
-
--- !Functions DOESNT WORK ANYMORE
--- OpenMessageBox (character, message)	
--- OpenMessageBoxChoice (character, message, choice1, choice2)	
--- OpenMessageBoxYesNo (character, message)
-
-
---New function (P6+)
-
--- Osi.ReadyCheckSpecific (eventId, translationId, force, initiator, character1, character2, character3)
--- Parameters:
--- eventId string
--- translationId string
--- force integer
--- initiator CHARACTER
--- character1 CHARACTER
--- character2 CHARACTER
--- character3 CHARACTER
-
---New event (P6+)
--- Osi.ReadyCheckFailed (id)
--- Osi.ReadyCheckPassed (id)
-
-
----Guess this is my life now
----@param eventId string
----@param content string
----@param force? number
----@param initiation? GUIDSTRING --Char who initatittititited the box idk fuck this shit garbage ass function fuck
----@param char1? GUIDSTRING
----@param char2? GUIDSTRING
----@param char3? GUIDSTRING
-local function FallenMessageBox(eventId, content, initiation, char1, char2, char3, force)
-    force = force or 1
-    initiation = initiation or Osi.GetHostCharacter()
-    char1 = char1 or ""
-    char2 = char2 or ""
-    char3 = char3 or ""
-    _G.INITIATOR = initiation
-    Osi.ReadyCheckSpecific(eventId, content, force, initiation, char1, char2, char3)
-end
-
-
-Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after",
-    function(caster, target, spell, spellType, spellElement, storyActionID)
-        if GUID(caster) == GUID(Osi.GetHostCharacter()) and GUID(target) == SELL_ADD_BAG_ITEM then
-            if MCMCONFIG:GetSettingValue("MOD_ENABLED", MOD_INFO.MOD_UUID) == true then
-                FallenMessageBox("message_warning_config_start", Messages.message_warning_config_start, caster)
-            else
-                FallenMessageBox("message_enable_mod", Messages.message_enable_mod, caster)
-            end
-        end
-    end)
-
--- Ext.Osiris.RegisterListener("ReadyCheckPassed", 1, "after", function(id)
---     if id == "message_warning_config_start" then
---         FallenMessageBox("message_bag_sell_mode", Messages.message_bag_sell_mode, INITIATOR)
---     elseif id == "message_enable_mod" then
---         CONFIG["MOD_ENABLED"] = 1
---     elseif id == "message_bag_sell_mode" then
---         CONFIG["BAG_SELL_MODE_ONLY"] = 1
---         FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATOR)
---     elseif id == "message_mark_as_ware" then
---         CONFIG["MARK_AS_WARE"] = 1
---         FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATOR)
---     elseif id == "message_user_list_only" then
---         CONFIG["CUSTOM_LISTS_ONLY"] = 1
---         local modVars = GetModVariables()
---         if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList then
---             FallenMessageBox("message_save_specific_list_already_exist",
---                 Messages.message_save_specific_list_already_exist, INITIATOR)
---         else
---             FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATOR)
---         end
---     elseif id == "message_save_specific_list_already_exist" then
---         local modVars = GetModVariables()
---         modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
---         LoadUserLists()
---         FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
---     elseif id == "message_save_specific_list" then
---         local modVars = GetModVariables()
---         if not modVars.Fallen_AutoSellerInfos.saveIdentifier then
---             local random = Ext.Math.Random(0, 999999999)
---             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
---             InitDefaultFilterList(GetSellPath(), default_sell)
---             LoadUserLists()
---         elseif modVars.Fallen_AutoSellerInfos.saveIdentifier then
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
---             LoadUserLists()
---         end
---         FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
---     elseif id == "message_clear_sell_list" then
---         InitDefaultFilterList(GetSellPath(), default_sell)
---         SellList.SELLLIST = {}
---         JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
---         FallenMessageBox("message_delete_bag",
---             Messages.message_delete_bag, INITIATOR)
---     elseif id == "message_delete_bag" then
---         Osi.UnloadItem(SELL_ADD_BAG_ITEM)
---         CONFIG["MOD_ENABLED"] = 0
---         Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
---         INITIATOR = nil
---         --! END 1
---     elseif id == "message_disable_mod" then
---         CONFIG["MOD_ENABLED"] = 0
---         Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
---         INITIATOR = nil
---         --! END 2
---     end
---     SyncModVariables()
---     UpdateBagInfoScreenWithConfig()
--- end)
-
--- Ext.Osiris.RegisterListener("ReadyCheckFailed", 1, "after", function(id)
---     if id == "message_warning_config_start" then
---         Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
---     elseif id == "message_enable_mod" then
---         CONFIG["MOD_ENABLED"] = 1
---     elseif id == "message_bag_sell_mode" then
---         CONFIG["BAG_SELL_MODE_ONLY"] = 0
---         FallenMessageBox("message_mark_as_ware", Messages.message_mark_as_ware, INITIATOR)
---     elseif id == "message_mark_as_ware" then
---         CONFIG["MARK_AS_WARE"] = 0
---         FallenMessageBox("message_user_list_only", Messages.message_user_list_only, INITIATOR)
---     elseif id == "message_user_list_only" then
---         CONFIG["CUSTOM_LISTS_ONLY"] = 0
---         local modVars = GetModVariables()
---         if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList then
---             FallenMessageBox("message_save_specific_list_already_exist",
---                 Messages.message_save_specific_list_already_exist, INITIATOR)
---         else
---             FallenMessageBox("message_save_specific_list", Messages.message_save_specific_list, INITIATOR)
---         end
---     elseif id == "message_save_specific_list_already_exist" then
---         FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
---     elseif id == "message_save_specific_list" then
---         FallenMessageBox("message_clear_sell_list", Messages.message_clear_sell_list, INITIATOR)
---     elseif id == "message_clear_sell_list" then
---         FallenMessageBox("message_delete_bag",
---             Messages.message_delete_bag, INITIATOR)
---     elseif id == "message_delete_bag" then
---         --! END 1
---         FallenMessageBox("message_disable_mod",
---             Messages.message_disable_mod, INITIATOR)
---     elseif id == "message_disable_mod" then
---         Osi.ToInventory(SELL_ADD_BAG_ITEM, INITIATOR or Osi.GetHostCharacter())
---         INITIATOR = nil
---         --! END 2
---     end
---     SyncModVariables()
---     UpdateBagInfoScreenWithConfig()
--- end)
---! OLD pre P5 when the game was still good
--- Ext.Osiris.RegisterListener("MessageBoxYesNoClosed", 3, "after", function(character, message, result)
---     local function handleConfig(configMessage, configValue, nextMessage)
---         if message == configMessage then
---             CONFIG[configValue] = result
---             --CONFIG:save()
---             if nextMessage then
---                 Osi.OpenMessageBoxYesNo(character, nextMessage)
---             else
---                 if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
---             end
---         end
---     end
-
---     -- Config Start
---     if message == Messages.message_warning_config_start then
---         if result == 1 then
---             Osi.OpenMessageBoxYesNo(character, Messages.message_bag_sell_mode)
---         else
---             if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
---         end
-
---         -- Config Sell mode only
---     elseif message == Messages.message_bag_sell_mode then
---         handleConfig(Messages.message_bag_sell_mode, "BAG_SELL_MODE_ONLY", Messages.message_mark_as_ware)
---     elseif message == Messages.message_mark_as_ware then
---         handleConfig(Messages.message_mark_as_ware, "MARK_AS_WARE", Messages.message_user_list_only)
-
---         -- Config user list only
---     elseif message == Messages.message_user_list_only then
---         local modVars = GetModVariables()
---         handleConfig(Messages.message_user_list_only, "CUSTOM_LISTS_ONLY",
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList
---             and Messages.message_save_specific_list_already_exist or Messages.message_save_specific_list)
-
---         -- Config save specific list
---     elseif message == Messages.message_save_specific_list then
---         local modVars = GetModVariables()
---         if result == 1 and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
---             local random = Ext.Math.Random(0, 999999999)
---             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
---             InitDefaultFilterList(GetSellPath(), default_sell)
---             LoadUserLists()
---         elseif result == 1 and modVars.Fallen_AutoSellerInfos.saveIdentifier then
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
---             LoadUserLists()
---         end
---         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-
---         -- Config save specific list already exist
---     elseif message == Messages.message_save_specific_list_already_exist then
---         local modVars = GetModVariables()
---         if result == 1 then
---             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = false
---             LoadUserLists()
---         end
---         Osi.OpenMessageBoxYesNo(character, Messages.message_clear_sell_list)
-
---         -- Config clear list
---     elseif message == Messages.message_clear_sell_list then
---         if result == 1 then
---             InitDefaultFilterList(GetSellPath(), default_sell)
---             SellList.SELLLIST = {}
---             JUNKTABLESET = Table.ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
---         end
---         Osi.OpenMessageBoxYesNo(character, Messages.message_delete_bag)
---         --Delete Bag
---     elseif message == Messages.message_delete_bag then
---         if result == 1 then
---             Osi.UnloadItem(SELL_ADD_BAG_ITEM)
---             local choice = result == 1 and 0 or 1
---             CONFIG["MOD_ENABLED"] = choice
---         else
---             Osi.OpenMessageBoxYesNo(character, Messages.message_disable_mod)
---         end
-
---         -- Disable mod
---     elseif message == Messages.message_disable_mod then
---         local choice = result == 1 and 0 or 1
---         CONFIG["MOD_ENABLED"] = choice
---         if SELL_ADD_BAG_ITEM then Osi.Pickup(character, SELL_ADD_BAG_ITEM, "", 1) end
-
---         -- Re-enable mod
---     elseif message == Messages.message_enable_mod then
---         handleConfig(Messages.message_enable_mod, "MOD_ENABLED", nil)
---     end
---     SyncModVariables()
---     UpdateBagInfoScreenWithConfig()
--- end)
-
-
 -- -------------------------------------------------------------------------- --
 --                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
 local function start(level, isEditor)
-    Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Features", function(tabHeader)
-        local myCustomWidget = tabHeader:AddButton("My custom widget")
-        myCustomWidget.OnClick = function()
-            _D("My custom widget was clicked!")
-        end
-    end)
-
+    BasicPrint("Sending message to client")
+    --Net.Send("FALLEN_AUTO_LOOT_SELLER", "start()")
 
 
     local modVars = GetModVariables()
@@ -704,6 +445,8 @@ local function start(level, isEditor)
         modVars.Fallen_AutoSellerInfos = {}; SyncModVariables()
     end
     if level == "SYS_CC_I" then return end
+
+
     Messages = ResolveMessagesHandles()
     --if not CONFIG then CONFIG = InitConfig() end
     local execTime = MeasureExecutionTime(function()
@@ -725,9 +468,7 @@ local function start(level, isEditor)
     DelayedCall(333, function()
         Bags.FindBagItemFromTemplate()
     end)
-    -- if CONFIG.ENABLE_LOGGING == 1 then
-    --     Files.FlushLogBuffer()
-    -- end
+
     UpdateBagInfoScreenWithConfig()
 end
 
@@ -766,4 +507,17 @@ Ext.RegisterNetListener("MCM_Saved_Setting", function(call, payload)
     end
 
     UpdateBagInfoScreenWithConfig()
+    SyncModVariables()
+end)
+
+--Set the checkbox state for save specific list
+Net.ListenFor("Fallen_AutoSell_Checkmark", function()
+    local modVars = GetModVariables()
+    if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList == true then
+        MCMCONFIG:SetSettingValue("SAVE_SPECIFIC_LIST", true, MOD_INFO.MOD_UUID)
+        DFprint("Set checkbox to checked")
+    else
+        MCMCONFIG:SetSettingValue("SAVE_SPECIFIC_LIST", false, MOD_INFO.MOD_UUID)
+        DFprint("Set checkbox to unchecked")
+    end
 end)
