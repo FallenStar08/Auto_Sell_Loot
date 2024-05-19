@@ -521,3 +521,9 @@ Net.ListenFor("Fallen_AutoSell_Checkmark", function()
         DFprint("Set checkbox to unchecked")
     end
 end)
+
+Net.ListenFor("Fallen_Autosell_Button_ClearList", function()
+    InitDefaultFilterList(GetSellPath(), default_sell)
+    SellList.SELLLIST = {}
+    JUNKTABLESET = ProcessTables(JUNKTABLE, KeepList.KEEPLIST, SellList.SELLLIST)
+end)

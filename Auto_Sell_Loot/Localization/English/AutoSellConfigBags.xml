@@ -1,11 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentList>
 	<content contentuid="hbbb9dc98g5791g4c49gab6dg0ee36d9db4c4" version="1">The Marvelous Sack of Commerce</content>
-	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Drag and drop items to the bag to add them to the list of automatically sold items.
-- Open the bag to edit your list
-- Removing an item from the bag in edit mode will remove it from the list and save it
-- The list is saved once you close the bag
-- Hit the bag on the ground to start configuring the mod</content>
+	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Drag and drop items to the bag to add them to the list of automatically sold items. - Open the bag to edit your list - Removing an item from the bag in edit mode will remove it from the list and save it - The list is saved once you close the bag - Hit the bag on the ground to start configuring the mod</content>
 	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">By magic's embrace, the item fades without a trace, in its stead, a golden grace. For adventurers in haste, a boon, a path to wealth they chase!</content>
 	<content contentuid="h995d430eg9629g40c8g9470g6f515582195b" version="1">You are about to begin configuring the auto-sell mod.&lt;br&gt; Please do not press the escape key and carefully review the available options.&lt;br&gt; Press "YES" to initiate the configuration or "NO" to cancel.</content>
 	<content contentuid="h70fb978cg63cbg44d2ga45eg89bcacb356c8" version="1">Would you like to enable sell mode only for the bag?&lt;br&gt; If you enable this option, items you drag and drop into the bag will not be automatically added to your sell list.</content>
@@ -17,4 +13,18 @@
 	<content contentuid="he488aa70g5d71g4c0egaf5cg68ac3804b28d" version="1">Disable the mod?&lt;br&gt; You can enable it back later by hitting the bag again.</content>
 	<content contentuid="hc28d17e2g37b5g4978gb1c6g56d048969ab8" version="1">Enable the mod back?</content>
 	<content contentuid="hd3cb471fg0b62g429eg97efg9f3a0f99cc7d" version="1">Mark items as ware instead of automatically selling them?</content>
+
+
+	<content contentuid="h4a4203c612df4b35b77af4eac4f1ca9e117c" version="1">Sold items value percentage</content>
+	<content contentuid="hcbb70d0d4d074bddbb86e2cf5baf9cff6595" version="1">Percentage of the item's value you'll get when it is automatically sold</content>
+	<content contentuid="hf185e9764ec54d098f8e30ca6152bdab3ag9" version="1">Manual selling only</content>
+	<content contentuid="h13e69b9b32fe47f6a0e83cd4b3827c249ffg" version="1">If enabled the mod won't automatically sell item and the bag will function as a trash can instead (it'll still pay you)</content>
+	<content contentuid="h97a3869307cd49ac95412af488b21a6a87d0" version="1">Don't use internal Junklist</content>
+	<content contentuid="h5dcb32c1172744a2b9327e57099bd66ad327" version="1">If enabled only the items you added to the bag yourself will be automatically sold</content>
+	<content contentuid="h88e6ede4a808472a98d19f9f35b9c55ag894" version="1">Mark items as ware instead of selling them</content>
+	<content contentuid="h62c83df6f20e4d449b9c277f41f7ae53d2aa" version="1">If enabled items will automatically be marked as ware instead of being automatically sold</content>
+	<content contentuid="h6731355505624be39a22ca2f5346e9c16a71" version="1">Use a save specific list of items to sell</content>
+	<content contentuid="h1e215883d4ae449c9d8af76749f64e18f479" version="1">If enabled your personal list of items to sell will only apply to this save, starting from when this setting is enabled</content>
+	<content contentuid="h0b6204424dee44c689cf73887a557a2e6d5c" version="1">!!!Clear personal list!!!</content>
+	<content contentuid="ha442f9c2c5bd427bafbbe98bc607fc21570e" version="1">WARNING THIS WILL CLEAR THE LIST YOU ARE CURRENTLY USING</content>
 </contentList>

@@ -33,6 +33,10 @@
                             "Options": {
                                 "Min": 0,
                                 "Max": 100
+                            },
+                            "Handles": {
+                                "NameHandle": "h4a4203c612df4b35b77af4eac4f1ca9e117c",
+                                "TooltipHandle": "hcbb70d0d4d074bddbb86e2cf5baf9cff6595"
                             }
                         },
                         {
@@ -40,6 +44,10 @@
                             "Name": "Manual selling only",
                             "Type": "checkbox",
                             "Default": false,
+                            "Handles": {
+                                "NameHandle": "hf185e9764ec54d098f8e30ca6152bdab3ag9",
+                                "TooltipHandle": "h13e69b9b32fe47f6a0e83cd4b3827c249ffg"
+                            },
                             "Tooltip": "If enabled the mod won't automatically sell items, you'll be able to sell them by dragging them into the bag."
                         },
                         {
@@ -47,6 +55,10 @@
                             "Name": "Only use custom lists",
                             "Type": "checkbox",
                             "Default": false,
+                            "Handles": {
+                                "NameHandle": "h97a3869307cd49ac95412af488b21a6a87d0",
+                                "TooltipHandle": "h5dcb32c1172744a2b9327e57099bd66ad327"
+                            },
                             "Tooltip": "If enabled the mod won't use the internal list of junk items and will only use the ones you added to it."
                         },
                         {
@@ -54,6 +66,10 @@
                             "Name": "Mark items as ware instead of selling them",
                             "Type": "checkbox",
                             "Default": false,
+                            "Handles": {
+                                "NameHandle": "h88e6ede4a808472a98d19f9f35b9c55ag894",
+                                "TooltipHandle": "h62c83df6f20e4d449b9c277f41f7ae53d2aa"
+                            },
                             "Tooltip": "If enabled the items will be marked for sale instead of being automatically sold."
                         },
                         {
@@ -61,6 +77,10 @@
                             "Name": "Use a save specific personal list.",
                             "Type": "checkbox",
                             "Default": false,
+                            "Handles": {
+                                "NameHandle": "h6731355505624be39a22ca2f5346e9c16a71",
+                                "TooltipHandle": "h1e215883d4ae449c9d8af76749f64e18f479"
+                            },
                             "Tooltip": "If enabled your sell list will only apply to this save starting from when this option is enabled."
                         }
                     ]

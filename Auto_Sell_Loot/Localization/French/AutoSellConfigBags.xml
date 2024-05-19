@@ -1,16 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentList>
 	<content contentuid="hbbb9dc98g5791g4c49gab6dg0ee36d9db4c4" version="1">La Merveilleuse Sacoche du Commerce</content>
-	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Faites glisser et déposez des objets dans le sac pour les ajouter à la liste des articles vendus automatiquement.
-- Ouvrez le sac pour modifier votre liste.
-- Retirer un objet du sac en mode édition le retirera de la liste et l'enregistrera.
-- La liste est enregistrée lorsque vous fermez le sac.
-- Frappez le sac au sol pour commencer la configuration du mod.</content>
+	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Faites glisser et déposez des objets dans le sac pour les ajouter à la liste des articles vendus automatiquement. - Ouvrez le sac pour modifier votre liste. - Retirer un objet du sac en mode édition le retirera de la liste et l'enregistrera. - La liste est enregistrée lorsque vous fermez le sac. - Frappez le sac au sol pour commencer la configuration du mod.</content>
 
-	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">Sous la magie, l'objet s'évanouit en mélodie légère,
-Une grâce dorée surgit, offrant richesse éphémère.
-Pour l'aventurier pressé, c'est un trésor à la clé,
-Un chemin vers la fortune, qu'il poursuit sans arrêt.</content>
+	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">Sous la magie, l'objet s'évanouit en mélodie légère, Une grâce dorée surgit, offrant richesse éphémère. Pour l'aventurier pressé, c'est un trésor à la clé, Un chemin vers la fortune, qu'il poursuit sans arrêt.</content>
 	<content contentuid="h995d430eg9629g40c8g9470g6f515582195b" version="1">Vous êtes sur le point de commencer la configuration du mod de vente automatique.&lt;br&gt; Veuillez ne pas appuyer sur la touche Échap et examiner attentivement les options disponibles.&lt;br&gt; Appuyez sur "OUI" pour lancer la configuration ou sur "NON" pour annuler.</content>
 	<content contentuid="h70fb978cg63cbg44d2ga45eg89bcacb356c8" version="1">Souhaitez-vous activer le mode "vente uniquement" pour le sac ?&lt;br&gt; Si vous activez cette option, les objets que vous faites glisser dans le sac ne seront pas automatiquement ajoutés à votre liste de vente.</content>
 	<content contentuid="hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae" version="1">Voulez-vous utiliser exclusivement votre liste de vente personnelle ?&lt;br&gt; En activant cette option, le mod n'utilisera pas sa liste d'objets inutiles interne, seuls les objets que vous ajoutez manuellement au sac seront automatiquement vendus.</content>
@@ -21,5 +14,18 @@ Un chemin vers la fortune, qu'il poursuit sans arrêt.</content>
 	<content contentuid="he488aa70g5d71g4c0egaf5cg68ac3804b28d" version="1">Désactiver le mod ?&lt;br&gt; Vous pouvez le réactiver ultérieurement en frappant à nouveau le sac.</content>
 	<content contentuid="hc28d17e2g37b5g4978gb1c6g56d048969ab8" version="1">Réactiver le mod ?</content>
 	<content contentuid="hd3cb471fg0b62g429eg97efg9f3a0f99cc7d" version="1">Marquer les objets comme marchandise au lieu de les vendre automatiquement?</content>
+
+	<content contentuid="h4a4203c612df4b35b77af4eac4f1ca9e117c" version="1">Pourcentage de la valeur des objets vendus</content>
+	<content contentuid="hcbb70d0d4d074bddbb86e2cf5baf9cff6595" version="1">Pourcentage de la valeur de l'objet qui sera obtenue après la vente automatique</content>
+	<content contentuid="hf185e9764ec54d098f8e30ca6152bdab3ag9" version="1">Vente manuelle uniquement</content>
+	<content contentuid="h13e69b9b32fe47f6a0e83cd4b3827c249ffg" version="1">Si cette option est activée, le sac fonctionnera comme une poubelle (mais une poubelle qui vous paie)</content>
+	<content contentuid="h97a3869307cd49ac95412af488b21a6a87d0" version="1">Ne pas utiliser la liste interne</content>
+	<content contentuid="h5dcb32c1172744a2b9327e57099bd66ad327" version="1">Si cette option est activée, seuls les objets que vous avez ajoutés au sac seront automatiquement vendus</content>
+	<content contentuid="h88e6ede4a808472a98d19f9f35b9c55ag894" version="1">Marquer les objets comme marchandises plutôt que de les vendre</content>
+	<content contentuid="h62c83df6f20e4d449b9c277f41f7ae53d2aa" version="1">Si cette option est activée, les objets seront marqués comme marchandises plutôt qu'automatiquement vendus</content>
+	<content contentuid="h6731355505624be39a22ca2f5346e9c16a71" version="1">Utiliser une liste spécifique à la sauvegarde</content>
+	<content contentuid="h1e215883d4ae449c9d8af76749f64e18f479" version="1">Si cette option est activée, votre liste personnelle s'appliquera uniquement à cette sauvegarde (à partir du moment où cette option sera cochée)</content>
+	<content contentuid="h0b6204424dee44c689cf73887a557a2e6d5c" version="1">!!!VIDER LA LISTE PERSO!!!</content>
+	<content contentuid="ha442f9c2c5bd427bafbbe98bc607fc21570e" version="1">ATTENTION : CE BOUTON VIDE LA LISTE DE VENTE PERSO QUE VOUS UTILISEZ ACTUELLEMENT</content>
 
 </contentList>
