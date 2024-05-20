@@ -436,7 +436,6 @@ end
 --                                   INIT/TESTING                             --
 -- -------------------------------------------------------------------------- --
 local function start(level, isEditor)
-    BasicPrint("Sending message to client")
     --Net.Send("FALLEN_AUTO_LOOT_SELLER", "start()")
 
 

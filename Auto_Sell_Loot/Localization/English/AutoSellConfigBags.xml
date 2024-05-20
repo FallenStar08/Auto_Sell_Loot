@@ -13,8 +13,6 @@
 	<content contentuid="he488aa70g5d71g4c0egaf5cg68ac3804b28d" version="1">Disable the mod?&lt;br&gt; You can enable it back later by hitting the bag again.</content>
 	<content contentuid="hc28d17e2g37b5g4978gb1c6g56d048969ab8" version="1">Enable the mod back?</content>
 	<content contentuid="hd3cb471fg0b62g429eg97efg9f3a0f99cc7d" version="1">Mark items as ware instead of automatically selling them?</content>
-
-
 	<content contentuid="h4a4203c612df4b35b77af4eac4f1ca9e117c" version="1">Sold items value percentage</content>
 	<content contentuid="hcbb70d0d4d074bddbb86e2cf5baf9cff6595" version="1">Percentage of the item's value you'll get when it is automatically sold</content>
 	<content contentuid="hf185e9764ec54d098f8e30ca6152bdab3ag9" version="1">Manual selling only</content>
@@ -27,6 +25,6 @@
 	<content contentuid="h1e215883d4ae449c9d8af76749f64e18f479" version="1">If enabled your personal list of items to sell will only apply to this save, starting from when this setting is enabled</content>
 	<content contentuid="h0b6204424dee44c689cf73887a557a2e6d5c" version="1">!!!Clear personal list!!!</content>
 	<content contentuid="ha442f9c2c5bd427bafbbe98bc607fc21570e" version="1">WARNING THIS WILL CLEAR THE LIST YOU ARE CURRENTLY USING</content>
-    <content contentuid="h22361e3d777f4387bab90f50f71e5afb76db" version="1">Toggle the mod on/off without uninstalling it.</content>
-    <content contentuid="h56b2bab51888486da0104d9e6990f1d93151" version="1">Enable mod</content>
+	<content contentuid="h22361e3d777f4387bab90f50f71e5afb76db" version="1">Toggle the mod on/off without uninstalling it.</content>
+	<content contentuid="h56b2bab51888486da0104d9e6990f1d93151" version="1">Enable mod</content>
 </contentList>
