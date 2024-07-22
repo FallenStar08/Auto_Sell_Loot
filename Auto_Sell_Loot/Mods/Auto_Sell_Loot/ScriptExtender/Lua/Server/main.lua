@@ -7,9 +7,7 @@ local SELL_VALUE_COUNTER = 0
 local FRACTIONAL_PART = 0
 local SEll_LIST_EDIT_MODE = false
 
-RegisterModVariable("Fallen_AutoSellerInfos")
 
-MCMCONFIG = Mods.BG3MCM.MCMAPI
 
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
@@ -67,22 +65,6 @@ function IsTransmogInvisible(ItemName, Item)
     return false
 end
 
-local function ResolveMessagesHandles()
-    local messages = {
-        message_warning_config_start = GetTranslatedString("h995d430eg9629g40c8g9470g6f515582195b"),
-        message_bag_sell_mode = GetTranslatedString("h70fb978cg63cbg44d2ga45eg89bcacb356c8"),
-        message_user_list_only = GetTranslatedString("hfda8e6cag7e53g41e5gb1b5g4892dbc8a8ae"),
-        message_save_specific_list = GetTranslatedString("h5172487eg9d0eg4c06g93e3g5badf1e9401c"),
-        message_save_specific_list_already_exist = GetTranslatedString("hbc85062bg1b97g4150g9d31gacac9018d58b"),
-        message_clear_sell_list = GetTranslatedString("hd5b72a24g4401g4986gae60g9db54155f4ca"),
-        message_disable_mod = GetTranslatedString("he488aa70g5d71g4c0egaf5cg68ac3804b28d"),
-        message_enable_mod = GetTranslatedString("hc28d17e2g37b5g4978gb1c6g56d048969ab8"),
-        message_delete_bag = GetTranslatedString("h4a84239ag4dd0g4311gbd5ege1aac8b9cca2"),
-        message_mark_as_ware = GetTranslatedString("hd3cb471fg0b62g429eg97efg9f3a0f99cc7d")
-    }
-    return messages
-end
-
 --Update bag description with mod infos
 local function UpdateBagInfoScreenWithConfig()
     local modVars = GetModVariables()
@@ -93,14 +75,16 @@ local function UpdateBagInfoScreenWithConfig()
 
     local handle = "he671bb1egab4fg4f2bg981egdd0b1e8585af"
 
+    local MCMSettings = GetMCMTable()
+
     -- Determine the color of each setting based on its value
-    local bagSellModeColor = MCMCONFIG:GetSettingValue("BAG_SELL_MODE_ONLY", MOD_INFO.MOD_UUID) == true and "green" or
+    local bagSellModeColor = MCMSettings["BAG_SELL_MODE_ONLY"] == true and "green" or
         "red"
-    local userListColor = MCMCONFIG:GetSettingValue("CUSTOM_LISTS_ONLY", MOD_INFO.MOD_UUID) == true and "green" or "red"
-    local markAsWareColor = MCMCONFIG:GetSettingValue("MARK_AS_WARE", MOD_INFO.MOD_UUID) == true and "green" or "red"
+    local userListColor = MCMSettings["CUSTOM_LISTS_ONLY"] == true and "green" or "red"
+    local markAsWareColor = MCMSettings["MARK_AS_WARE"] == true and "green" or "red"
     local useSaveSpecificSellListColor = modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList and "green" or "red"
     local saveIdentifierColor = modVars.Fallen_AutoSellerInfos.saveIdentifier and "green" or "red"
-    local modEnabledColor = MCMCONFIG:GetSettingValue("MOD_ENABLED", MOD_INFO.MOD_UUID) == true and "green" or "red"
+    local modEnabledColor = MCMSettings["MOD_ENABLED"] == true and "green" or "red"
 
     -- Convert RGB colors to hexadecimal
     local greenHex = RgbToHex(0, 255, 0)
@@ -110,17 +94,17 @@ local function UpdateBagInfoScreenWithConfig()
     -- Format the strings with appropriate color tags
     local bagSellModeText = string.format("<font color='%s'>%s</font>",
         bagSellModeColor == "green" and greenHex or redHex,
-        tostring(MCMCONFIG:GetSettingValue("BAG_SELL_MODE_ONLY", MOD_INFO.MOD_UUID) == true))
+        tostring(MCMSettings["BAG_SELL_MODE_ONLY"] == true))
     local userListText = string.format("<font color='%s'>%s</font>", userListColor == "green" and greenHex or redHex,
-        tostring(MCMCONFIG:GetSettingValue("CUSTOM_LISTS_ONLY", MOD_INFO.MOD_UUID) == true))
+        tostring(MCMSettings["CUSTOM_LISTS_ONLY"] == true))
     local markAsWareText = string.format("<font color='%s'>%s</font>", markAsWareColor == "green" and greenHex or redHex,
-        tostring(MCMCONFIG:GetSettingValue("MARK_AS_WARE", MOD_INFO.MOD_UUID) == true))
+        tostring(MCMSettings["MARK_AS_WARE"] == true))
     local useSaveSpecificSellListText = string.format("<font color='%s'>%s</font>",
         useSaveSpecificSellListColor == "green" and greenHex or orangeHex, useSaveSpecificSellList)
     local saveIdentifierText = string.format("<font color='%s'>%s</font>",
         saveIdentifierColor == "green" and greenHex or orangeHex, saveIdentifier)
     local modEnabledText = string.format("<font color='%s'>%s</font>", modEnabledColor == "green" and greenHex or redHex,
-        tostring(MCMCONFIG:GetSettingValue("MOD_ENABLED", MOD_INFO.MOD_UUID) == true))
+        tostring(MCMSettings["MOD_ENABLED"] == true))
 
     local content = string.format(
         "Mod settings:\n - Bag Sell Mode Only: %s\n - User List Only: %s\n - Mark as ware mode: %s\n - Save Specific List: %s\n - Save Identifier: %s \n - Mod Enabled : %s",
@@ -206,7 +190,7 @@ function Bags.MarkExistingItemsAsWare(root)
 end
 
 function Bags.AddToSellList(item_name, root, item, bagOwner)
-    if MCMCONFIG:GetSettingValue("BAG_SELL_MODE_ONLY", MOD_INFO.MOD_UUID) == true then return end
+    if GetMCM("BAG_SELL_MODE_ONLY") == true then return end
     if StringEmpty(item_name) then
         BasicDebug("AddToSellList() - BAD ITEM with root : " .. root)
         return
@@ -217,7 +201,7 @@ function Bags.AddToSellList(item_name, root, item, bagOwner)
     JSON.LuaTableToFile(SellList, GetSellPath())
     BasicDebug("AddToSellList() - Added the following item to the sell list item name : " ..
         item_name .. " root : " .. root)
-    if MCMCONFIG:GetSettingValue("MARK_AS_WARE", MOD_INFO.MOD_UUID) == true then
+    if GetMCM("MARK_AS_WARE") == true then
         DelayedCall(500, function()
             Osi.ToInventory(item, bagOwner, 99999999)
             Bags.MarkExistingItemsAsWare(root)
@@ -288,7 +272,7 @@ function HandleSelling(Owner, Character, Root, Item)
         itemValueCache[Item] = itemValue
     end
     itemValue = itemValue * exactItemAmount
-    local sellValue = itemValue * MCMCONFIG:GetSettingValue("SELL_VALUE_PERCENTAGE", MOD_INFO.MOD_UUID) / 100
+    local sellValue = itemValue * GetMCM("SELL_VALUE_PERCENTAGE") / 100
     -- Accumulate the sell values
     SELL_VALUE_COUNTER = SELL_VALUE_COUNTER + sellValue
     if SELL_VALUE_COUNTER >= 1 then
@@ -339,7 +323,7 @@ end
 
 -- Includes moving from container to other inventories etc...
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
-    if MCMCONFIG:GetSettingValue("MOD_ENABLED", MOD_INFO.MOD_UUID) == false then
+    if GetMCM("MOD_ENABLED") == false then
         return -- Ignore if initialization not done or mod is disabled
     end
 
@@ -371,7 +355,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
     end
 
     -- Specific to BAG SELL MODE ONLY
-    if MCMCONFIG:GetSettingValue("BAG_SELL_MODE_ONLY", MOD_INFO.MOD_UUID) == true and inventoryHolder == SELL_ADD_BAG_ITEM then
+    if GetMCM("BAG_SELL_MODE_ONLY") == true and inventoryHolder == SELL_ADD_BAG_ITEM then
         local char = Osi.GetOwner(SELL_ADD_BAG_ITEM)
         HandleSelling(char, inventoryHolder, root, item)
         return
@@ -407,7 +391,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
             if Osi.IsContainer(item) == 1 then
                 Osi.MoveAllItemsTo(item, inventoryHolder)
             end
-            if MCMCONFIG:GetSettingValue("MARK_AS_WARE", MOD_INFO.MOD_UUID) == true then
+            if GetMCM("MARK_AS_WARE") == true then
                 MarkAsWare(item)
                 return
             else
@@ -445,8 +429,6 @@ local function start(level, isEditor)
     end
     if level == "SYS_CC_I" then return end
 
-
-    Messages = ResolveMessagesHandles()
     --if not CONFIG then CONFIG = InitConfig() end
     local execTime = MeasureExecutionTime(function()
         InitFilters()

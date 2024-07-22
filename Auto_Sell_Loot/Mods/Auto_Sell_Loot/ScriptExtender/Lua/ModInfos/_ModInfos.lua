@@ -1,4 +1,4 @@
-local default_config={
+local default_config = {
     SELL_VALUE_PERCENTAGE = 40,
     LOG_ENABLED = 0,
     MOD_ENABLED = 1,
@@ -10,4 +10,6 @@ local default_config={
     MARK_AS_WARE = 0,
 }
 
-MOD_INFO=ModInfo:new("Fall_AutoSeller","Fall_AutoSeller",true,default_config)
+RegisterModVariable("Fallen_AutoSellerInfos")
+
+MOD_INFO = ModInfo:new("Fall_AutoSeller", "Fall_AutoSeller", true, default_config)
