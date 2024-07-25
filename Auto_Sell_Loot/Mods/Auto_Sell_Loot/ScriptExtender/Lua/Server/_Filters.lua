@@ -9,6 +9,24 @@ _G.default_keep = {
     KEEPLIST = {}
 }
 
+--Check filter lists
+local function isValidSet(set)
+    local isValid = true
+    if not set then
+        isValid = false
+    else
+        for k, v in pairs(set) do
+            if type(k) ~= "string" or type(v) ~= "string" then
+                BasicWarning("isValidSet() - Set isn't valid : ")
+                BasicWarning(set)
+                isValid = false
+                break
+            end
+        end
+    end
+    return isValid
+end
+
 
 function GetSellPath()
     local modVars = GetModVariables()
@@ -35,7 +53,7 @@ local function ensureAllListsExist()
     else
         -- Validate selllist structure
         local selllist = JSON.LuaTableFromFile(sellPath)
-        if not selllist or not selllist.SELLLIST or type(selllist.SELLLIST) ~= "table" or not Table.IsValidSet(selllist.SELLLIST) then
+        if not selllist or not selllist.SELLLIST or type(selllist.SELLLIST) ~= "table" or not isValidSet(selllist.SELLLIST) then
             BasicWarning("EnsureAllListsExist() - Invalid selllist structure detected. Reinitializing...")
             InitDefaultFilterList(sellPath, default_sell)
         end
@@ -47,7 +65,7 @@ local function ensureAllListsExist()
     else
         -- Validate keeplist structure
         local keeplist = JSON.LuaTableFromFile(keepPath)
-        if not keeplist or not keeplist.KEEPLIST or type(keeplist.KEEPLIST) ~= "table" or not Table.IsValidSet(keeplist.KEEPLIST) then
+        if not keeplist or not keeplist.KEEPLIST or type(keeplist.KEEPLIST) ~= "table" or not isValidSet(keeplist.KEEPLIST) then
             BasicWarning("EnsureAllListsExist() - Invalid keeplist structure detected. Reinitializing...")
             InitDefaultFilterList(keepPath, default_keep)
         end
@@ -96,7 +114,7 @@ end
 
 function ProcessTables(baseTable, keeplistTable, selllistTable)
     -- User Lists only, clear baseTable
-    if MCMCONFIG:GetSettingValue("CUSTOM_LISTS_ONLY", MOD_INFO.MOD_UUID) == true then baseTable = {} end
+    if GetMCM("CUSTOM_LISTS_ONLY") == true then baseTable = {} end
 
     --Merge sell entries to the base list
     for name, uid in pairs(selllistTable) do baseTable[name] = uid end
