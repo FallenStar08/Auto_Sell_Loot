@@ -387,7 +387,7 @@ Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item,
             return
         end
 
-        if Table.FindKeyInSet(JUNKTABLESET, itemName) then
+        if JUNKTABLESET[itemName] then
             if Osi.IsContainer(item) == 1 then
                 Osi.MoveAllItemsTo(item, inventoryHolder)
             end
@@ -495,10 +495,10 @@ end)
 Net.ListenFor("Fallen_AutoSell_Checkmark", function()
     local modVars = GetModVariables()
     if modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList == true then
-        MCMCONFIG:SetSettingValue("SAVE_SPECIFIC_LIST", true, MOD_INFO.MOD_UUID)
+        SetMCM("SAVE_SPECIFIC_LIST", true)
         DFprint("Set checkbox to checked")
     else
-        MCMCONFIG:SetSettingValue("SAVE_SPECIFIC_LIST", false, MOD_INFO.MOD_UUID)
+        SetMCM("SAVE_SPECIFIC_LIST", false)
         DFprint("Set checkbox to unchecked")
     end
 end)
