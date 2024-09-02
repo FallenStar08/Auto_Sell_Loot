@@ -462,18 +462,15 @@ Ext.Events.ResetCompleted:Subscribe(start)
 --                                     MCM                                    --
 -- -------------------------------------------------------------------------- --
 
-Ext.RegisterNetListener("MCM_Saved_Setting", function(call, payload)
-    local data = Ext.Json.Parse(payload)
-    if not data or data.modGUID ~= MOD_INFO.MOD_UUID or not data.settingId then
+Ext.ModEvents.BG3MCM["MCM_Setting_Saved"]:Subscribe(function(data)
+    if not data or data.modUUID ~= MOD_INFO.MOD_UUID or not data.settingId then
         return
     end
-
-
 
     if data.settingId == "SAVE_SPECIFIC_LIST" then
         local modVars = GetModVariables()
         if data.value == true and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
-            local random = Ext.Math.Random(0, 999999999)
+            local random = math.random(0, 999999999)
             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
             InitDefaultFilterList(GetSellPath(), default_sell)
