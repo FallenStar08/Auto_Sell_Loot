@@ -29,38 +29,15 @@ end
 --Zap back pouch inventory to dummy
 --Nuke pouch
 --Profit
-local function MoveItemToHiddeyHole(character, item, amount)
+local function deleteItem(item)
     Osi.RequestDelete(item)
 end
 
--- function Bags.MoveNakedManItemsToBag(bag)
---     Osi.MoveAllItemsTo(NAKED_DUMMY_2, bag)
--- end
-
--- function BringHideyHoleToMe()
---     local x, y, z = Osi.GetPosition(NAKED_DUMMY_2)
---     Osi.TeleportTo(NAKED_DUMMY_2, Osi.GetHostCharacter())
---     Ext.OnNextTick(function() Osi.SetOnStage(NAKED_DUMMY_2, 1) end)
---     Osi.SetImmortal(NAKED_DUMMY_2, 1)
---     local dummy = Ext.Entity.Get(NAKED_DUMMY_2)
---     dummy.CanEnterChasm.CanEnter = false
---     dummy.CanBeLooted.Flags = 1
---     dummy:Replicate("CanBeLooted")
---     dummy:Replicate("CanEnterChasm")
---     --Ext.OnNextTick(function() Osi.ActivateTrade(Osi.GetHostCharacter(),NAKED_DUMMY_2,1) end)
--- end
-
 --Anti morbing measure, this ain't morbing time
-function IsTransmogInvisible(ItemName, Item)
-    if ItemName == "LOOT_GEN_Ring_A_Gem_A_Gold" then
-        BasicDebug("IsTransmogInvisible() - " .. ItemName .. " UUID : " .. Item)
-        BasicDebug("StatString : " .. Ext.Entity.Get(Item).Data.StatsId)
-        if Ext.Entity.Get(Item).Data.StatsId == "ARM_Ring_A_Gem_A_Gold" then
-            return false
-        else
-            BasicWarning("IsTransmogInvisible() - Ignoring invisible transmorbed item, this is not a ring!")
-            return true
-        end
+local function IsTransmogInvisible(itemName, item)
+    if itemName == "LOOT_GEN_Ring_A_Gem_A_Gold" then
+        local statsId = Ext.Entity.Get(item).Data.StatsId
+        return statsId ~= "ARM_Ring_A_Gem_A_Gold"
     end
     return false
 end
@@ -145,7 +122,7 @@ function Bags.AddContentToList(bagItem, character)
             local template = Ext.Template.GetTemplate(uuid) or (templateGuid and Ext.Template.GetTemplate(templateGuid)) or
                 "0"
             REMOVER_BAG_CONTENT_LIST[template.Name] = GUID(templateGuid)
-            MoveItemToHiddeyHole(bagItem, uuid, 99999999)
+            deleteItem(uuid)
         end
         Osi.CharacterRemoveTaggedItems(character, FALLEN_TAGS["FALLEN_MARK_FOR_DELETION"], 10000000)
     end
@@ -282,13 +259,13 @@ function HandleSelling(Owner, Character, Root, Item)
         AddGoldTo(Owner, goldToAdd)
         BasicDebug("HandleSelling() - Adding " .. goldToAdd .. " Gold to Character")
         --DeleteItem(Character, Item, exactItemAmount)
-        MoveItemToHiddeyHole(Character, Item, exactItemAmount)
+        deleteItem(Item)
         SELL_VALUE_COUNTER = 0
         FRACTIONAL_PART = FRACTIONAL_PART - math.floor(FRACTIONAL_PART) -- Keep the remaining fractional part for later
         BasicDebug("HandleSelling() - Leftovers " .. FRACTIONAL_PART .. " Gold kept for later")
     else
         --DeleteItem(Character, Item, exactItemAmount)
-        MoveItemToHiddeyHole(Character, Item, exactItemAmount)
+        deleteItem(Item)
     end
 end
 
@@ -323,7 +300,7 @@ end
 
 -- Includes moving from container to other inventories etc...
 Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "before", function(root, item, inventoryHolder, addType)
-    if GetMCM("MOD_ENABLED") == false then
+    if GetMCM("MOD_ENABLED") == false or not MOD_READY then
         return -- Ignore if initialization not done or mod is disabled
     end
 
@@ -428,7 +405,7 @@ local function start(level, isEditor)
         modVars.Fallen_AutoSellerInfos = {}; SyncModVariables()
     end
     if level == "SYS_CC_I" then return end
-
+    MOD_READY = true
     --if not CONFIG then CONFIG = InitConfig() end
     local execTime = MeasureExecutionTime(function()
         InitFilters()
