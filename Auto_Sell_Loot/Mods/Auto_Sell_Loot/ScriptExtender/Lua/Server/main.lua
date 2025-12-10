@@ -1,13 +1,10 @@
 JUNKTABLE = Ext.Require("Server/junk_table.lua")
 Ext.Require("Server/_Filters.lua")
 
-
 Bags = {}
 local SELL_VALUE_COUNTER = 0
 local FRACTIONAL_PART = 0
 local SEll_LIST_EDIT_MODE = false
-
-
 
 -- -------------------------------------------------------------------------- --
 --                                General Stuff                               --
@@ -97,11 +94,9 @@ local function UpdateBagInfoScreenWithConfig()
     UpdateTranslatedString(handle, content)
 end
 
-
 -- -------------------------------------------------------------------------- --
 --                                Bags function & related Events              --
 -- -------------------------------------------------------------------------- --
-
 
 -- Fill an existing bag with items from a list
 function Bags.AddAllListItemToBag(list, bagItem, character)
@@ -148,7 +143,12 @@ end
 -- Function to add a bag to a character if it isn't already in their inventory
 -- or in another party member's inventory (to avoid duplicate bags)
 function Bags.AddBag(bag, character, notification)
-    for _, player in pairs(SQUADIES) do if Osi.TemplateIsInInventory(bag, player) >= 1 then return end end
+    for _, player in pairs(SQUADIES) do
+        local count = Osi.TemplateIsInInventory(bag, player)
+        if count and count >= 1 then
+            return
+        end
+    end
     BasicPrint(string.format("Bags.AddBag() Adding bag : %s to character : %s", bag, character))
     Osi.TemplateAddTo(bag, character, 1, notification)
 end
@@ -190,7 +190,8 @@ function Bags.FindBagItemFromTemplate()
     if SELL_ADD_BAG_ITEM == "" then
         BasicDebug("FindBagItemFromTemplate() - Trying to find BAG UUID...")
         for _, player in pairs(SQUADIES) do
-            if Osi.TemplateIsInInventory(SELL_ADD_BAG_ROOT, player) >= 1 then
+            local count = Osi.TemplateIsInInventory(SELL_ADD_BAG_ROOT, player)
+            if count and count >= 1 then
                 SELL_ADD_BAG_ITEM = Osi.GetItemByTemplateInInventory(SELL_ADD_BAG_ROOT, player)
                 BasicPrint("FindBagItemFromTemplate() Selling bag UUID found : " .. SELL_ADD_BAG_ITEM)
             end
@@ -272,7 +273,6 @@ end
 -- -------------------------------------------------------------------------- --
 --                            Core Logic Listeners                            --
 -- -------------------------------------------------------------------------- --
-
 
 -- Update SQUADIES for when a character joins the party
 Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(Character)
@@ -399,7 +399,6 @@ end
 local function start(level, isEditor)
     --Net.Send("FALLEN_AUTO_LOOT_SELLER", "start()")
 
-
     local modVars = GetModVariables()
     if not modVars.Fallen_AutoSellerInfos then
         modVars.Fallen_AutoSellerInfos = {}; SyncModVariables()
@@ -434,7 +433,6 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", start)
 
 Ext.Events.ResetCompleted:Subscribe(start)
 
-
 -- -------------------------------------------------------------------------- --
 --                                     MCM                                    --
 -- -------------------------------------------------------------------------- --
@@ -447,6 +445,7 @@ Ext.ModEvents.BG3MCM["MCM_Setting_Saved"]:Subscribe(function(data)
     if data.settingId == "SAVE_SPECIFIC_LIST" then
         local modVars = GetModVariables()
         if data.value == true and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
+            --Generate an UUID instead
             local random = math.random(0, 999999999)
             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
