@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentList>
 	<content contentuid="hbbb9dc98g5791g4c49gab6dg0ee36d9db4c4" version="1">The Marvelous Sack of Commerce</content>
-	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Drag and drop items to the bag to add them to the list of automatically sold items. - Open the bag to edit your list - Removing an item from the bag in edit mode will remove it from the list and save it - The list is saved once you close the bag - Hit the bag on the ground to start configuring the mod</content>
+	<content contentuid="h52f85295ga79bg4101gab57g07012ae166d2" version="1">- Drag and drop items to the bag to add them to the list of automatically sold items. - Open the bag to edit your list - Removing an item from the bag in edit mode will remove it from the list and save it - The list is saved once you close the bag - Use MCM to configure the mod.</content>
 	<content contentuid="he671bb1egab4fg4f2bg981egdd0b1e8585af" version="1">By magic's embrace, the item fades without a trace, in its stead, a golden grace. For adventurers in haste, a boon, a path to wealth they chase!</content>
 	<content contentuid="h995d430eg9629g40c8g9470g6f515582195b" version="1">You are about to begin configuring the auto-sell mod.&lt;br&gt; Please do not press the escape key and carefully review the available options.&lt;br&gt; Press "YES" to initiate the configuration or "NO" to cancel.</content>
 	<content contentuid="h70fb978cg63cbg44d2ga45eg89bcacb356c8" version="1">Would you like to enable sell mode only for the bag?&lt;br&gt; If you enable this option, items you drag and drop into the bag will not be automatically added to your sell list.</content>
