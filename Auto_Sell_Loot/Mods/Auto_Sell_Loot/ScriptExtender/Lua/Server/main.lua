@@ -445,8 +445,7 @@ Ext.ModEvents.BG3MCM["MCM_Setting_Saved"]:Subscribe(function(data)
     if data.settingId == "SAVE_SPECIFIC_LIST" then
         local modVars = GetModVariables()
         if data.value == true and not modVars.Fallen_AutoSellerInfos.saveIdentifier then
-            --Generate an UUID instead
-            local random = math.random(0, 999999999)
+            local random = GenerateUUID()
             modVars.Fallen_AutoSellerInfos.saveIdentifier = random
             modVars.Fallen_AutoSellerInfos.useSaveSpecificSellList = true
             InitDefaultFilterList(GetSellPath(), default_sell)
